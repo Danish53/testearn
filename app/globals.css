@@ -1,0 +1,240 @@
+@import "tailwindcss";
+
+/*
+  Solar Earning — single source of truth for theme colors.
+  Change these variables to retone the entire site.
+*/
+:root {
+  --solar-bg-deep: #040508;
+  --solar-bg-elevated: #0a0e14;
+  --solar-bg-card: #0f141c;
+  --solar-border: rgba(255, 255, 255, 0.08);
+  --solar-text: #f4f4f5;
+  --solar-text-muted: #94a3b8;
+  /* Primary brand — use sitewide via solar-accent / solar-accent-strong */
+  --solar-accent: #1facee;
+  --solar-accent-strong: #1590c4;
+  /* Aliases — same primary only (#1FACEE system) */
+  --solar-sun: #1facee;
+  --solar-sun-soft: color-mix(in srgb, var(--solar-accent) 16%, transparent);
+  --solar-glow: color-mix(in srgb, var(--solar-accent) 30%, transparent);
+  --solar-foreground-on-accent: #020617;
+}
+
+@theme inline {
+  --color-solar-bg-deep: var(--solar-bg-deep);
+  --color-solar-bg-elevated: var(--solar-bg-elevated);
+  --color-solar-bg-card: var(--solar-bg-card);
+  --color-solar-border: var(--solar-border);
+  --color-solar-text: var(--solar-text);
+  --color-solar-text-muted: var(--solar-text-muted);
+  --color-solar-accent: var(--solar-accent);
+  --color-solar-accent-strong: var(--solar-accent-strong);
+  --color-solar-sun: var(--solar-sun);
+  --color-solar-sun-soft: var(--solar-sun-soft);
+  --color-solar-glow: var(--solar-glow);
+  --color-solar-foreground-on-accent: var(--solar-foreground-on-accent);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* html {
+  overflow-x: hidden;
+} */
+
+body {
+  background-color: var(--solar-bg-deep);
+  color: var(--solar-text);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  /* overflow-x: hidden; */
+}
+
+/* Diagonal-framed imagery (reference-style) */
+.clip-solar-hero-left {
+  clip-path: polygon(0 6%, 100% 0, 100% 100%, 6% 94%);
+}
+
+.clip-solar-hero-right {
+  clip-path: polygon(0 0, 94% 0, 100% 94%, 0 100%);
+}
+
+@media (max-width: 1023px) {
+  .clip-solar-hero-left,
+  .clip-solar-hero-right {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+/* Section framing — subtle top highlight */
+.section-frame {
+  position: relative;
+}
+
+.section-frame::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08) 40%,
+    color-mix(in srgb, var(--solar-accent) 22%, transparent) 50%,
+    rgba(255, 255, 255, 0.08) 60%,
+    transparent
+  );
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Light band sections (alternating with dark) */
+.section-frame-light {
+  position: relative;
+  border-bottom: 1px solid rgb(226 232 240);
+}
+
+.section-frame-light::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(226 232 240) 35%,
+    color-mix(in srgb, var(--solar-accent) 45%, transparent) 50%,
+    rgb(226 232 240) 65%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* Dashboard sidebar — reference pill menu (dark + solar accent left glow) */
+@layer components {
+  .dash-sidebar {
+    position: relative;
+    background: linear-gradient(
+      180deg,
+      #0f151c 0%,
+      #0a0f14 45%,
+      #070a0e 100%
+    );
+    box-shadow: 4px 0 28px -6px rgba(0, 0, 0, 0.6);
+  }
+
+  .dash-sidebar::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--solar-accent) 90%, white),
+      var(--solar-accent),
+      var(--solar-accent-strong)
+    );
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--solar-accent) 65%, transparent),
+      0 0 4px var(--solar-accent);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .dash-sidebar-nav {
+    padding: 0.5rem 0 1.5rem;
+  }
+
+  .dash-sidebar-nav__item {
+    padding: 0.55rem 0;
+  }
+
+  .dash-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 1.125rem;
+    margin-left: 1.125rem;
+    margin-right: 1rem;
+    padding: 0.9rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.92);
+    transition:
+      background 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.15s ease;
+  }
+
+  @media (min-width: 640px) {
+    .dash-sidebar-link {
+      padding: 0.95rem 1.35rem;
+      font-size: 1rem;
+    }
+  }
+
+  .dash-sidebar-link:hover:not(.dash-sidebar-link--active) {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+  }
+
+  .dash-sidebar-link:active:not(.dash-sidebar-link--active) {
+    transform: scale(0.99);
+  }
+
+  .dash-sidebar-link--active {
+    color: #fff;
+    font-weight: 600;
+    background: linear-gradient(
+      90deg,
+      var(--solar-accent) 0%,
+      color-mix(in srgb, var(--solar-accent) 75%, var(--solar-accent-strong)) 45%,
+      var(--solar-accent-strong) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow:
+      0 4px 22px -4px color-mix(in srgb, var(--solar-accent) 55%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .dash-sidebar-link--active svg {
+    color: #fff;
+  }
+}
+
+/*
+ * Sidebar nav scroll — outside @layer so WebKit scrollbar rules are not affected
+ * by Tailwind’s cascade layers (fixes missing / invisible scrollbar styling).
+ */
+aside.dash-sidebar .dash-sidebar-nav-scroll {
+  padding-right: 0.125rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--solar-accent) 55%, transparent) rgba(255, 255, 255, 0.06);
+}
+
+aside.dash-sidebar .dash-sidebar-nav-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+aside.dash-sidebar .dash-sidebar-nav-scroll::-webkit-scrollbar-track {
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+}
+
+aside.dash-sidebar .dash-sidebar-nav-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--solar-accent) 70%, #0a0e14);
+  border-radius: 999px;
+  border: 1px solid rgba(31, 172, 238, 0.35);
+}
+
+aside.dash-sidebar .dash-sidebar-nav-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--solar-accent);
+}
