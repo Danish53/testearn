@@ -1,43 +1,40 @@
 import { NextResponse } from "next/server";
-import { jwtVerify } from "jose";
+import { verifyAdminToken } from "@/lib/auth/admin-jwt";
+import { ADMIN_COOKIE } from "@/lib/api/admin-cookie";
 
-const AUTH_ROUTES = ["/login", "/register", "/verify-otp"];
-const PROTECTED_PREFIX = "/dashboard";
-
-function getSecret() {
-  return new TextEncoder().encode(process.env.JWT_SECRET || "dev-jwt-secret-change-me");
-}
-
-async function isTokenValid(token) {
-  try {
-    await jwtVerify(token, getSecret());
-    return true;
-  } catch {
-    return false;
-  }
+function loginRedirect(request, pathname) {
+  const login = new URL("/login", request.url);
+  login.searchParams.set("from", pathname);
+  return login;
 }
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("auth_token")?.value;
-  const valid = token ? await isTokenValid(token) : false;
 
-  const isProtected = pathname === PROTECTED_PREFIX || pathname.startsWith(`${PROTECTED_PREFIX}/`);
-  const isAuthPage = AUTH_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`));
-
-  if (isProtected && !valid) {
-    const login = new URL("/login", request.url);
-    login.searchParams.set("from", pathname);
-    return NextResponse.redirect(login);
+  if (!pathname.startsWith("/admin")) {
+    return NextResponse.next();
   }
 
-  if (isAuthPage && valid) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  if (pathname === "/admin/login") {
+    return NextResponse.redirect(loginRedirect(request, "/admin"));
   }
 
-  return NextResponse.next();
+  const token = request.cookies.get(ADMIN_COOKIE)?.value;
+  if (!token) {
+    return NextResponse.redirect(loginRedirect(request, pathname));
+  }
+
+  try {
+    await verifyAdminToken(token);
+    return NextResponse.next();
+  } catch {
+    const login = loginRedirect(request, pathname);
+    const res = NextResponse.redirect(login);
+    res.cookies.delete(ADMIN_COOKIE);
+    return res;
+  }
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register", "/verify-otp"],
+  matcher: ["/admin", "/admin/:path*"],
 };

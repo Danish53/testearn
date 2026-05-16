@@ -1,9 +1,10 @@
+import { Suspense } from "react";
 import AuthShell from "@/components/auth/AuthShell";
 import RegisterForm from "@/components/auth/RegisterForm";
 
 export const metadata = {
   title: "Register — Earning",
-  description: "Create your Earning account to access solar insights and tools.",
+  description: "Create your Earning account. Your username is your referral code.",
 };
 
 export default function RegisterPage() {
@@ -12,9 +13,15 @@ export default function RegisterPage() {
       <AuthShell
         variant="register"
         title="Register"
-        subtitle="Create an account with username, email, and password. Referral code is optional."
+        subtitle="Username becomes your referral code. Open an invite link to auto-fill your sponsor’s code."
       >
-        <RegisterForm />
+        <Suspense
+          fallback={
+            <p className="text-center text-sm text-solar-text-muted">Loading form…</p>
+          }
+        >
+          <RegisterForm />
+        </Suspense>
       </AuthShell>
     </main>
   );

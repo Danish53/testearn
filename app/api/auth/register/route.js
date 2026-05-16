@@ -1,9 +1,10 @@
 import { connectDB } from "@/lib/mongodb";
 import { hashPassword } from "@/lib/auth/password";
 import { generateOtpCode, hashOtp, otpExpiryDate } from "@/lib/auth/otp";
-import { buildReferralCode } from "@/lib/auth/referral";
+import { isValidUsername, referralCodeFromUsername } from "@/lib/auth/referral";
 import { sendOtpEmail } from "@/lib/email/sendOtp";
 import { jsonError, jsonOk } from "@/lib/api/response";
+import { ensureUserWallet } from "@/lib/wallet/provision";
 import User from "@/models/User";
 
 export async function POST(request) {
@@ -12,9 +13,16 @@ export async function POST(request) {
     const username = String(body.username || "").trim().toLowerCase();
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
-    const referralCode = String(body.referralCode || "").trim().toUpperCase();
+    const sponsorCode = String(body.referralCode || body.sponsorCode || "")
+      .trim()
+      .toUpperCase();
 
-    if (!username || username.length < 3) {
+    if (!isValidUsername(username)) {
+      return jsonError("Username must be 3–32 letters and numbers only (a–z, 0–9)");
+    }
+
+    const ownReferralCode = referralCodeFromUsername(username);
+    if (!ownReferralCode || ownReferralCode.length < 3) {
       return jsonError("Username must be at least 3 characters");
     }
     if (!email || !email.includes("@")) {
@@ -32,8 +40,11 @@ export async function POST(request) {
     }
 
     let referredBy = null;
-    if (referralCode) {
-      const referrer = await User.findOne({ referralCode, isVerified: true });
+    if (sponsorCode) {
+      if (sponsorCode === ownReferralCode) {
+        return jsonError("You cannot use your own referral code");
+      }
+      const referrer = await User.findOne({ referralCode: sponsorCode, isVerified: true });
       if (!referrer) {
         return jsonError("Invalid referral code");
       }
@@ -52,13 +63,13 @@ export async function POST(request) {
       user.otpHash = otpHash;
       user.otpExpiresAt = otpExpiryDate();
       user.isVerified = false;
-      if (!user.referralCode) user.referralCode = buildReferralCode(username);
+      user.referralCode = ownReferralCode;
     } else {
       user = await User.create({
         username,
         email,
         passwordHash,
-        referralCode: buildReferralCode(username),
+        referralCode: ownReferralCode,
         referredBy,
         isVerified: false,
         otpHash,
@@ -66,10 +77,11 @@ export async function POST(request) {
       });
     }
 
+    await ensureUserWallet(user);
     await sendOtpEmail(email, otp);
 
     return jsonOk({
-      message: "Verification code sent to your email",
+      message: "Verification code sent. Your USDT wallets (TRC20 + BEP20) are ready after email verification.",
       email: user.email,
     });
   } catch (err) {

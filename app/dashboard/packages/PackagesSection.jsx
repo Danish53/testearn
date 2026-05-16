@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ArrowRight,
   Check,
   Crown,
   DollarSign,
   GitBranch,
+  Loader2,
   Package,
   Sparkles,
   TrendingUp,
@@ -14,6 +15,8 @@ import {
 } from "lucide-react";
 import { PACKAGES } from "@/components/dashboard/packages-data";
 import { DASH } from "@/components/dashboard/dashboard-ui";
+import { setUser } from "@/store/slices/authSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 function formatUsd(amount) {
   return `$${amount.toLocaleString("en-US")}`;
@@ -37,7 +40,9 @@ function CommissionPill({ label, value, variant }) {
   );
 }
 
-function PackageCard({ pkg, busy, onBuy }) {
+function PackageCard({ pkg, busy, balance, onBuy }) {
+  const canAfford = balance >= pkg.investment;
+
   return (
     <article
       className={`relative flex flex-col overflow-hidden rounded-2xl border bg-[#0b1018]/90 shadow-xl shadow-black/40 ring-1 backdrop-blur-md ${
@@ -93,9 +98,6 @@ function PackageCard({ pkg, busy, onBuy }) {
             <span className="font-bold text-solar-accent">{formatUsd(pkg.dailyProfit)}</span>
             {" daily"}
           </p>
-          <p className="mt-1.5 text-center text-[10px] text-slate-500">
-            ~33.33% return per day · credited to balance
-          </p>
         </div>
       </div>
 
@@ -112,30 +114,31 @@ function PackageCard({ pkg, busy, onBuy }) {
         <ul className="mt-4 space-y-2 border-t border-white/[0.06] pt-4 text-sm text-slate-400">
           <li className="flex gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-solar-accent" strokeWidth={2} />
-            Earn {formatUsd(pkg.dailyProfit)} every day on this plan
+            Deducted from wallet balance instantly
           </li>
           <li className="flex gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-solar-accent" strokeWidth={2} />
-            Direct: {pkg.directPercent}% · Indirect: {pkg.indirectPercent}%
-          </li>
-          <li className="flex gap-2">
-            <Check className="mt-0.5 h-4 w-4 shrink-0 text-solar-accent" strokeWidth={2} />
-            Activated from wallet balance (USDT)
+            Daily profit auto-credited once per day
           </li>
         </ul>
 
         <button
           type="button"
-          disabled={busy}
+          disabled={busy || !canAfford}
           onClick={onBuy}
-          className={`mt-5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold shadow-lg transition disabled:opacity-60 ${
+          className={`mt-5 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold shadow-lg transition disabled:cursor-not-allowed disabled:opacity-50 ${
             pkg.popular
               ? "bg-gradient-to-r from-solar-accent to-solar-accent-strong text-solar-foreground-on-accent shadow-solar-accent/30 hover:brightness-110"
               : "border border-white/15 bg-white/[0.08] text-white hover:border-solar-accent/40 hover:bg-solar-accent/15"
           }`}
         >
           {busy ? (
-            "Processing…"
+            <span className="inline-flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              Activating…
+            </span>
+          ) : !canAfford ? (
+            "Insufficient balance"
           ) : (
             <>
               Activate {pkg.shortName}
@@ -149,11 +152,72 @@ function PackageCard({ pkg, busy, onBuy }) {
 }
 
 export default function PackagesSection() {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((s) => s.auth.user);
   const [busyId, setBusyId] = useState(null);
+  const [active, setActive] = useState([]);
+  const [profitMsg, setProfitMsg] = useState("");
+  const [error, setError] = useState("");
 
-  function handleBuy(id) {
-    setBusyId(id);
-    window.setTimeout(() => setBusyId(null), 900);
+  const balance = user?.balance ?? 0;
+
+  const loadActive = useCallback(async () => {
+    try {
+      const res = await fetch("/api/investment/active", { credentials: "include" });
+      if (!res.ok) return;
+      const data = await res.json();
+      setActive(data.investments || []);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const runAccrue = useCallback(async () => {
+    try {
+      const res = await fetch("/api/investment/accrue", {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data.user) dispatch(setUser(data.user));
+      if (data.credited > 0) {
+        setProfitMsg(data.message);
+        await loadActive();
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [dispatch, loadActive]);
+
+  useEffect(() => {
+    if (!user?.isVerified) return;
+    void loadActive();
+    void runAccrue();
+  }, [user?.isVerified, loadActive, runAccrue]);
+
+  async function handleBuy(packageId) {
+    setError("");
+    setBusyId(packageId);
+    try {
+      const res = await fetch("/api/investment/purchase", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packageId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.message || "Purchase failed");
+        return;
+      }
+      if (data.user) dispatch(setUser(data.user));
+      setProfitMsg(data.message);
+      await loadActive();
+    } catch {
+      setError("Could not activate package");
+    } finally {
+      setBusyId(null);
+    }
   }
 
   return (
@@ -161,17 +225,62 @@ export default function PackagesSection() {
       <div>
         <h1 className={DASH.h1}>VIP Packages</h1>
         <p className={DASH.lead}>
-          Nine investment tiers — each level triples the plan. Daily profit is one-third of your
-          investment (e.g. {formatUsd(3)} → {formatUsd(1)} per day). Build your team for direct and
-          indirect commissions.
+          Select a plan — balance is deducted, investment activates, and daily profit is credited
+          automatically (once per UTC day per active plan).
         </p>
       </div>
 
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className={DASH.card}>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            Wallet balance
+          </p>
+          <p className="mt-1 text-3xl font-bold tabular-nums text-solar-accent">
+            {formatUsd(balance)}
+          </p>
+        </div>
+        <div className={DASH.card}>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            Active package
+          </p>
+          <p className="mt-1 text-xl font-bold text-white">{user?.activePackage || "None"}</p>
+          <p className="mt-1 text-sm text-solar-accent">
+            Est. daily: {formatUsd(user?.dailyEarnings ?? 0)}
+          </p>
+        </div>
+      </div>
+
+      {error ? (
+        <p className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {error}
+        </p>
+      ) : null}
+      {profitMsg ? (
+        <p className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          {profitMsg}
+        </p>
+      ) : null}
+
+      {active.length > 0 ? (
+        <section className={DASH.card}>
+          <h2 className="text-sm font-semibold text-white">Active investments</h2>
+          <ul className="mt-3 space-y-2">
+            {active.map((inv) => (
+              <li
+                key={inv.id}
+                className="flex flex-wrap justify-between gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 text-sm"
+              >
+                <span className="font-medium text-white">{inv.packageName}</span>
+                <span className="text-solar-accent tabular-nums">
+                  +{formatUsd(inv.dailyProfit)}/day · paid {formatUsd(inv.totalProfitPaid)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section className={`relative ${DASH.card} overflow-hidden`}>
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_0%,color-mix(in_srgb,var(--solar-accent)_18%,transparent),transparent_55%)]"
-          aria-hidden
-        />
         <div className="relative grid gap-5 sm:grid-cols-3">
           <div className="flex gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-solar-accent/20 text-solar-accent ring-1 ring-solar-accent/30">
@@ -179,8 +288,8 @@ export default function PackagesSection() {
             </div>
             <div>
               <p className="text-sm font-semibold text-white">9 VIP plans</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
-                From {formatUsd(3)} to {formatUsd(19683)} — scale as your balance grows.
+              <p className="mt-0.5 text-xs text-slate-400">
+                From {formatUsd(3)} to {formatUsd(19683)}
               </p>
             </div>
           </div>
@@ -190,9 +299,7 @@ export default function PackagesSection() {
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Daily earning</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
-                Fixed daily payout per tier (⅓ of investment each day).
-              </p>
+              <p className="mt-0.5 text-xs text-slate-400">Auto-credited to balance daily</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -200,10 +307,8 @@ export default function PackagesSection() {
               <GitBranch className="h-5 w-5" strokeWidth={2} aria-hidden />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">Team levels</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
-                Direct and indirect referral bonuses on every package purchase.
-              </p>
+              <p className="text-sm font-semibold text-white">Referral bonus</p>
+              <p className="mt-0.5 text-xs text-slate-400">Direct commission on each purchase</p>
             </div>
           </div>
         </div>
@@ -214,15 +319,12 @@ export default function PackagesSection() {
           <PackageCard
             key={pkg.id}
             pkg={pkg}
+            balance={balance}
             busy={busyId === pkg.id}
-            onBuy={() => handleBuy(pkg.id)}
+            onBuy={() => void handleBuy(pkg.id)}
           />
         ))}
       </div>
-
-      <p className="text-center text-xs text-slate-500">
-        Demo UI — connect admin panel &amp; wallet API for live purchases and payouts.
-      </p>
     </div>
   );
 }

@@ -24,9 +24,17 @@ export default function LoginForm() {
     e.preventDefault();
     dispatch(clearAuthError());
     try {
-      await dispatch(loginUser({ email, password })).unwrap();
-      const from = searchParams.get("from") || "/dashboard";
-      router.push(from.startsWith("/dashboard") ? from : "/dashboard");
+      const result = await dispatch(loginUser({ email, password })).unwrap();
+      const from = searchParams.get("from") || "";
+      if (result?.role === "admin") {
+        const dest = from.startsWith("/admin") ? from : "/admin";
+        router.push(dest);
+        router.refresh();
+        return;
+      }
+      const dest =
+        from.startsWith("/dashboard") || from === "/dashboard" ? from : "/dashboard";
+      router.push(dest || "/dashboard");
     } catch (err) {
       const msg = err?.message || "";
       if (msg.toLowerCase().includes("verify")) {

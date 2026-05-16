@@ -1,9 +1,5 @@
-import { connectDB } from "@/lib/mongodb";
-import { comparePassword } from "@/lib/auth/password";
-import { signAuthToken } from "@/lib/auth/jwt";
-import { setAuthCookie } from "@/lib/api/auth-cookie";
+import { performLogin } from "@/lib/auth/perform-login";
 import { jsonError, jsonOk } from "@/lib/api/response";
-import User from "@/models/User";
 
 export async function POST(request) {
   try {
@@ -11,32 +7,16 @@ export async function POST(request) {
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
 
-    if (!email || !password) {
-      return jsonError("Email and password are required");
+    const result = await performLogin(email, password);
+    if (!result.ok) {
+      return jsonError(result.message, result.status);
     }
 
-    await connectDB();
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return jsonError("Invalid email or password", 401);
-    }
-    if (!user.isVerified) {
-      return jsonError("Please verify your email first", 403);
+    if (result.role === "admin") {
+      return jsonOk({ role: "admin", admin: result.admin });
     }
 
-    const match = await comparePassword(password, user.passwordHash);
-    if (!match) {
-      return jsonError("Invalid email or password", 401);
-    }
-
-    const token = await signAuthToken({
-      userId: user._id.toString(),
-      email: user.email,
-    });
-    await setAuthCookie(token);
-
-    return jsonOk({ user: user.toPublicJSON() });
+    return jsonOk({ role: "user", user: result.user });
   } catch (err) {
     console.error("login:", err);
     return jsonError(err.message || "Login failed", 500);

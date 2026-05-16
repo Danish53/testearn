@@ -13,7 +13,7 @@ export default function LoginPage() {
       <AuthShell
         variant="login"
         title="Login"
-        subtitle="Enter your email and password to continue."
+        subtitle="Sign in with your account — members go to the dashboard, administrators to the admin panel."
       >
         <Suspense fallback={<p className="text-sm text-solar-text-muted">Loading…</p>}>
           <LoginForm />

@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import { verifyOtp } from "@/lib/auth/otp";
 import { signAuthToken } from "@/lib/auth/jwt";
-import { generateUserWallet } from "@/lib/wallet/generate";
+import { ensureUserWallet } from "@/lib/wallet/provision";
 import { setAuthCookie } from "@/lib/api/auth-cookie";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import User from "@/models/User";
@@ -37,12 +37,12 @@ export async function POST(request) {
       return jsonError("Invalid verification code");
     }
 
-    const wallet = await generateUserWallet();
-    user.wallet = wallet;
+    await ensureUserWallet(user);
     user.isVerified = true;
     user.otpHash = null;
     user.otpExpiresAt = null;
     await user.save();
+    await user.populate("referredBy", "username referralCode");
 
     const token = await signAuthToken({
       userId: user._id.toString(),

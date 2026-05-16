@@ -43,10 +43,14 @@ export const loginUser = createAsyncThunk("auth/login", async ({ email, password
   const res = await fetch("/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ email, password }),
   });
   const data = await parseResponse(res);
-  return data.user;
+  if (data.role === "admin") {
+    return { role: "admin", admin: data.admin };
+  }
+  return { role: "user", user: data.user };
 });
 
 export const fetchSession = createAsyncThunk("auth/fetchSession", async () => {
@@ -76,6 +80,10 @@ const authSlice = createSlice({
     },
     setPendingEmail(state, action) {
       state.pendingEmail = action.payload;
+    },
+    setUser(state, action) {
+      state.user = action.payload;
+      state.isAuthenticated = Boolean(action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -114,8 +122,13 @@ const authSlice = createSlice({
       .addCase(loginUser.pending, setPending)
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
-        state.isAuthenticated = true;
+        if (action.payload?.role === "admin") {
+          state.user = null;
+          state.isAuthenticated = false;
+        } else {
+          state.user = action.payload?.user ?? action.payload;
+          state.isAuthenticated = Boolean(state.user);
+        }
       })
       .addCase(loginUser.rejected, setRejected)
 
@@ -143,5 +156,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAuthError, setPendingEmail } = authSlice.actions;
+export const { clearAuthError, setPendingEmail, setUser } = authSlice.actions;
 export default authSlice.reducer;
