@@ -22,6 +22,9 @@ const withdrawalSchema = new mongoose.Schema(
     failReason: { type: String, default: "" },
     approvedAt: { type: Date, default: null },
     completedAt: { type: Date, default: null },
+    /** Legacy: true if balance was deducted when user submitted (old flow). */
+    balanceDeductedAtRequest: { type: Boolean, default: false },
+    approvedByAdmin: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

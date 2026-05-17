@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { PACKAGES } from "@/components/dashboard/packages-data";
 import { DASH } from "@/components/dashboard/dashboard-ui";
+import ProfitCountdown from "@/components/dashboard/ProfitCountdown";
 import { setUser } from "@/store/slices/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
@@ -118,7 +119,7 @@ function PackageCard({ pkg, busy, balance, onBuy }) {
           </li>
           <li className="flex gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-solar-accent" strokeWidth={2} />
-            Daily profit auto-credited once per day
+            Profit every 24h — credited to wallet balance
           </li>
         </ul>
 
@@ -180,10 +181,8 @@ export default function PackagesSection() {
       });
       const data = await res.json();
       if (data.user) dispatch(setUser(data.user));
-      if (data.credited > 0) {
-        setProfitMsg(data.message);
-        await loadActive();
-      }
+      if (data.credited > 0) setProfitMsg(data.message);
+      await loadActive();
     } catch {
       /* ignore */
     }
@@ -225,8 +224,8 @@ export default function PackagesSection() {
       <div>
         <h1 className={DASH.h1}>VIP Packages</h1>
         <p className={DASH.lead}>
-          Select a plan — balance is deducted, investment activates, and daily profit is credited
-          automatically (once per UTC day per active plan).
+          Deposit USDT to your wallet, buy a plan (balance deducted), then earn daily profit every
+          24 hours — timer shows time until the next payout.
         </p>
       </div>
 
@@ -268,12 +267,21 @@ export default function PackagesSection() {
             {active.map((inv) => (
               <li
                 key={inv.id}
-                className="flex flex-wrap justify-between gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 text-sm"
+                className="grid gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 sm:grid-cols-[1fr_auto]"
               >
-                <span className="font-medium text-white">{inv.packageName}</span>
-                <span className="text-solar-accent tabular-nums">
-                  +{formatUsd(inv.dailyProfit)}/day · paid {formatUsd(inv.totalProfitPaid)}
-                </span>
+                <div>
+                  <p className="font-medium text-white">{inv.packageName}</p>
+                  <p className="mt-0.5 text-sm text-solar-accent tabular-nums">
+                    +{formatUsd(inv.dailyProfit)}/cycle · paid {formatUsd(inv.totalProfitPaid)}
+                  </p>
+                </div>
+                <ProfitCountdown
+                  nextProfitAt={inv.nextProfitAt}
+                  profitDue={inv.profitDue}
+                  secondsRemaining={inv.secondsRemaining}
+                  dailyProfit={inv.dailyProfit}
+                  onDue={() => void runAccrue()}
+                />
               </li>
             ))}
           </ul>
@@ -281,7 +289,7 @@ export default function PackagesSection() {
       ) : null}
 
       <section className={`relative ${DASH.card} overflow-hidden`}>
-        <div className="relative grid gap-5 sm:grid-cols-3">
+        <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
           <div className="flex gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-solar-accent/20 text-solar-accent ring-1 ring-solar-accent/30">
               <Package className="h-5 w-5" strokeWidth={2} aria-hidden />
@@ -299,7 +307,7 @@ export default function PackagesSection() {
             </div>
             <div>
               <p className="text-sm font-semibold text-white">Daily earning</p>
-              <p className="mt-0.5 text-xs text-slate-400">Auto-credited to balance daily</p>
+              <p className="mt-0.5 text-xs text-slate-400">Every 24h after activation or last payout</p>
             </div>
           </div>
           <div className="flex gap-3">

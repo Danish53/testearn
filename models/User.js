@@ -61,6 +61,8 @@ const userSchema = new mongoose.Schema(
       default: "user",
       index: true,
     },
+    isBlocked: { type: Boolean, default: false, index: true },
+    blockedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
@@ -96,7 +98,7 @@ userSchema.methods.toPublicJSON = function toPublicJSON() {
       ? {
           bep20Address: this.wallet?.bep20Address || "",
           trc20Address: this.wallet?.trc20Address || "",
-          networks: ["USDT_TRC20", "USDT_BEP20"],
+          networks: ["USDT_BEP20", "USDT_TRC20"],
         }
       : undefined,
     walletCreatedAt: this.walletCreatedAt || null,

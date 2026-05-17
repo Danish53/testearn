@@ -16,11 +16,13 @@ const depositSchema = new mongoose.Schema(
     confirmations: { type: Number, default: 0 },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "credited", "below_minimum"],
+      enum: ["pending", "confirmed", "credited", "below_minimum", "failed"],
       default: "pending",
     },
+    failReason: { type: String, default: "" },
     blockTime: { type: Date, default: null },
     creditedAt: { type: Date, default: null },
+    lastCheckedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

@@ -4,6 +4,7 @@ import { generateOtpCode, hashOtp, otpExpiryDate } from "@/lib/auth/otp";
 import { isValidUsername, referralCodeFromUsername } from "@/lib/auth/referral";
 import { sendOtpEmail } from "@/lib/email/sendOtp";
 import { jsonError, jsonOk } from "@/lib/api/response";
+import { getReferralSettings } from "@/lib/referral/settings";
 import { ensureUserWallet } from "@/lib/wallet/provision";
 import User from "@/models/User";
 
@@ -39,6 +40,8 @@ export async function POST(request) {
       return jsonError("Email or username already registered", 409);
     }
 
+    const referralSettings = await getReferralSettings();
+
     let referredBy = null;
     if (sponsorCode) {
       if (sponsorCode === ownReferralCode) {
@@ -49,6 +52,8 @@ export async function POST(request) {
         return jsonError("Invalid referral code");
       }
       referredBy = referrer._id;
+    } else if (referralSettings.requireSponsorOnRegister) {
+      return jsonError("Referral / sponsor code is required to register");
     }
 
     const passwordHash = await hashPassword(password);
@@ -81,7 +86,7 @@ export async function POST(request) {
     await sendOtpEmail(email, otp);
 
     return jsonOk({
-      message: "Verification code sent. Your USDT wallets (TRC20 + BEP20) are ready after email verification.",
+      message: "Verification code sent. Your USDT wallets (BEP20 + TRC20) are ready after email verification.",
       email: user.email,
     });
   } catch (err) {

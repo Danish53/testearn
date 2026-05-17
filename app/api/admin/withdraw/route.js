@@ -1,43 +1,39 @@
-import { connectDB } from "@/lib/mongodb";
 import { isAdminRequest } from "@/lib/admin/authorize-request";
+import { listAdminWithdrawals } from "@/lib/admin/withdrawals";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import {
+  approveManualWithdrawal,
   approveAndExecuteWithdrawal,
   rejectWithdrawal,
 } from "@/lib/withdraw/process";
-import Withdrawal from "@/models/Withdrawal";
+import { WITHDRAW_AUTO_SEND } from "@/lib/withdraw/constants";
 
-/** GET pending withdrawals (admin). */
+/** GET withdrawals — ?status=pending|completed|all */
 export async function GET(request) {
   try {
     if (!(await isAdminRequest(request))) {
       return jsonError("Unauthorized", 401);
     }
-    await connectDB();
-    const pending = await Withdrawal.find({ status: "pending" })
-      .sort({ createdAt: 1 })
-      .populate("userId", "username email")
-      .lean();
 
-    return jsonOk({
-      withdrawals: pending.map((w) => ({
-        id: w._id.toString(),
-        username: w.userId?.username,
-        email: w.userId?.email,
-        network: w.network,
-        amount: w.amount,
-        receiveAmount: w.receiveAmount,
-        toAddress: w.toAddress,
-        createdAt: w.createdAt,
-      })),
+    const { searchParams } = new URL(request.url);
+    const result = await listAdminWithdrawals({
+      status: searchParams.get("status") || "pending",
+      page: searchParams.get("page") || 1,
+      limit: searchParams.get("limit") || 20,
     });
+
+    return jsonOk(result);
   } catch (err) {
     console.error("admin/withdraw GET:", err);
     return jsonError(err.message || "Failed", 500);
   }
 }
 
-/** POST approve or reject: { withdrawalId, action: "approve" | "reject", reason? } */
+/**
+ * POST approve or reject
+ * approve: { withdrawalId, action: "approve", txHash? } — manual payout + balance deduct
+ * reject: { withdrawalId, action: "reject", reason? }
+ */
 export async function POST(request) {
   try {
     if (!(await isAdminRequest(request))) {
@@ -53,13 +49,21 @@ export async function POST(request) {
     }
 
     if (action === "approve") {
-      const w = await approveAndExecuteWithdrawal(withdrawalId);
+      const txHash = String(body.txHash || "").trim();
+      const w = WITHDRAW_AUTO_SEND
+        ? await approveAndExecuteWithdrawal(withdrawalId)
+        : await approveManualWithdrawal(withdrawalId, txHash);
+
       return jsonOk({
-        message: "Withdrawal processed",
+        message: WITHDRAW_AUTO_SEND
+          ? "Withdrawal sent on-chain"
+          : "Withdrawal approved — user balance updated",
         withdrawal: {
           id: w._id.toString(),
           status: w.status,
           txHash: w.txHash,
+          receiveAmount: w.receiveAmount,
+          network: w.network,
         },
       });
     }
@@ -67,7 +71,7 @@ export async function POST(request) {
     if (action === "reject") {
       const w = await rejectWithdrawal(withdrawalId, body.reason || "");
       return jsonOk({
-        message: "Withdrawal rejected — balance refunded",
+        message: "Withdrawal rejected — reserved balance released",
         withdrawal: { id: w._id.toString(), status: w.status },
       });
     }

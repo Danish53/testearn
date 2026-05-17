@@ -17,7 +17,7 @@ export default function CopyField({ label, value, mono = true }) {
   }
 
   return (
-    <div>
+    <div className="min-w-0">
       {label ? (
         <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
           {label}
@@ -25,14 +25,14 @@ export default function CopyField({ label, value, mono = true }) {
       ) : null}
       <div className="flex gap-2">
         <div
-          className={`min-w-0 flex-1 truncate rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-sm text-white ${mono ? "font-mono" : ""}`}
+          className={`min-w-0 flex-1 break-all rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-xs leading-relaxed text-white sm:text-sm ${mono ? "font-mono" : ""}`}
         >
           {value}
         </div>
         <button
           type="button"
           onClick={handleCopy}
-          className="flex shrink-0 items-center justify-center rounded-xl border border-solar-accent/30 bg-solar-accent/15 px-3.5 text-solar-accent transition hover:bg-solar-accent/25"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-solar-accent/30 bg-solar-accent/15 text-solar-accent transition hover:bg-solar-accent/25 active:scale-[0.98]"
           aria-label={copied ? "Copied" : "Copy"}
         >
           {copied ? (

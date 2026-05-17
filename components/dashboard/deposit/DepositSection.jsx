@@ -14,17 +14,21 @@ import DepositQrCode from "@/components/dashboard/deposit/DepositQrCode";
 import { DASH } from "@/components/dashboard/dashboard-ui";
 import PageHeader from "@/components/dashboard/PageHeader";
 import { MIN_DEPOSIT_USDT } from "@/lib/deposit/constants";
+import {
+  DEFAULT_NETWORK_ID,
+  walletNetworksForUser,
+} from "@/lib/wallet/networks";
 import { setUser } from "@/store/slices/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 const STEPS = [
-  "Open this page and select TRC20 or BEP20",
+  "Open this page and select BEP20 or TRC20",
   "Copy the address or scan the QR code",
   "Send USDT from Trust Wallet, Binance, or any wallet",
-  "We scan the blockchain every 30s — balance updates automatically",
+  "We scan the blockchain about every 60s — credited USDT appears in wallet balance",
 ];
 
-const POLL_MS = 30_000;
+const POLL_MS = 60_000;
 
 function statusLabel(status) {
   const map = {
@@ -39,29 +43,14 @@ function statusLabel(status) {
 export default function DepositSection() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
-  const [network, setNetwork] = useState("trc20");
+  const [network, setNetwork] = useState(DEFAULT_NETWORK_ID);
   const [scanning, setScanning] = useState(false);
   const [lastScan, setLastScan] = useState(null);
   const [scanMessage, setScanMessage] = useState("");
   const [history, setHistory] = useState([]);
 
   const networks = useMemo(
-    () => [
-      {
-        id: "trc20",
-        label: "TRC20",
-        chain: "Tron",
-        token: "USDT",
-        address: user?.wallet?.trc20Address || "",
-      },
-      {
-        id: "bep20",
-        label: "BEP20",
-        chain: "BNB Smart Chain",
-        token: "USDT",
-        address: user?.wallet?.bep20Address || "",
-      },
-    ],
+    () => walletNetworksForUser(user?.wallet),
     [user?.wallet]
   );
 
@@ -90,7 +79,12 @@ export default function DepositSection() {
       const data = await res.json();
       setLastScan(new Date());
       if (data.user) dispatch(setUser(data.user));
-      setScanMessage(data.message || (data.success ? "Scan complete" : "Scan failed"));
+      const credited = data.creditedCount > 0;
+      setScanMessage(
+        credited
+          ? `${data.message} — wallet balance updated.`
+          : data.message || (data.success ? "Scan complete" : "Scan failed")
+      );
       await loadHistory();
     } catch {
       setScanMessage("Could not reach deposit scanner");
@@ -118,7 +112,7 @@ export default function DepositSection() {
         lead="Send USDT to your personal address. Blockchain monitoring runs automatically — your balance updates when payment is confirmed."
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className={`${DASH.card} sm:col-span-1`}>
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             Available balance
@@ -160,7 +154,7 @@ export default function DepositSection() {
             USDT only
           </span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className={DASH.filterScroll}>
           {networks.map((n) => (
             <button
               key={n.id}
@@ -168,12 +162,17 @@ export default function DepositSection() {
               onClick={() => setNetwork(n.id)}
               className={`${DASH.tab} ${network === n.id ? DASH.tabActive : DASH.tabIdle}`}
             >
-              {n.token} · {n.label} · {n.chain}
+              <span className="sm:hidden">
+                {n.label} · {n.chain}
+              </span>
+              <span className="hidden sm:inline">
+                {n.token} · {n.label} · {n.chain}
+              </span>
             </button>
           ))}
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_auto]">
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_auto]">
           <div className="space-y-4">
             <div className="rounded-xl border border-white/[0.08] bg-black/20 px-4 py-3">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">

@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import { verifyOtp } from "@/lib/auth/otp";
 import { signAuthToken } from "@/lib/auth/jwt";
+import { applyVerificationBonuses } from "@/lib/referral/bonuses";
 import { ensureUserWallet } from "@/lib/wallet/provision";
 import { setAuthCookie } from "@/lib/api/auth-cookie";
 import { jsonError, jsonOk } from "@/lib/api/response";
@@ -42,6 +43,7 @@ export async function POST(request) {
     user.otpHash = null;
     user.otpExpiresAt = null;
     await user.save();
+    await applyVerificationBonuses(user);
     await user.populate("referredBy", "username referralCode");
 
     const token = await signAuthToken({

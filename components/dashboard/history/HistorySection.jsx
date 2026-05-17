@@ -87,22 +87,24 @@ export default function HistorySection() {
         lead="Deposits and withdrawals in one ledger — updated when blockchain payments are detected or payouts are processed."
       />
 
-      <div className="flex flex-wrap items-center gap-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            onClick={() => setFilter(f.id)}
-            className={`${DASH.tab} ${filter === f.id ? DASH.tabActive : DASH.tabIdle}`}
-          >
-            {f.label}
-          </button>
-        ))}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className={`${DASH.filterScroll} flex-1`}>
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => setFilter(f.id)}
+              className={`${DASH.tab} ${filter === f.id ? DASH.tabActive : DASH.tabIdle}`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
         <button
           type="button"
           onClick={() => void loadAll()}
           disabled={loading}
-          className={`${DASH.btnSecondary} ml-auto min-h-[40px] px-4 py-2 text-xs`}
+          className={`${DASH.btnSecondary} sm:shrink-0`}
         >
           {loading ? "Refreshing…" : "Refresh"}
         </button>
@@ -115,7 +117,53 @@ export default function HistorySection() {
       ) : null}
 
       <section className={DASH.panel}>
-        <div className="overflow-x-auto">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16 md:hidden">
+            <Loader2 className="h-8 w-8 animate-spin text-solar-accent" aria-hidden />
+            <p className="mt-3 text-sm text-slate-500">Loading history…</p>
+          </div>
+        ) : filtered.length > 0 ? (
+          <ul className={DASH.listMobile}>
+            {filtered.map((tx) => (
+              <li key={`${tx.type}-${tx.id}-m`} className={DASH.listMobileItem}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-white">{tx.label}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      {tx.date} · {tx.time}
+                    </p>
+                    {tx.network ? (
+                      <p className="mt-1 text-[10px] font-semibold uppercase text-slate-500">
+                        {tx.network}
+                      </p>
+                    ) : null}
+                    {tx.txHash ? (
+                      <p className="mt-1 break-all font-mono text-[10px] text-slate-600">{tx.txHash}</p>
+                    ) : null}
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p
+                      className={`text-sm font-bold tabular-nums ${
+                        tx.amount > 0
+                          ? "text-emerald-400"
+                          : tx.amount < 0
+                            ? "text-slate-300"
+                            : "text-red-300"
+                      }`}
+                    >
+                      {formatAmount(tx.amount, tx.status)}
+                    </p>
+                    <div className="mt-2 flex justify-end">
+                      <StatusBadge status={tx.status} tone={txStatusTone(tx.status)} />
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        <div className={`${DASH.tableWrap} hidden md:block`}>
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
               <tr className="border-b border-white/10 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
@@ -143,7 +191,7 @@ export default function HistorySection() {
                     </td>
                     <td className="px-4 py-3">
                       <p className="font-medium text-white">{tx.label}</p>
-                      <p className="font-mono text-xs text-slate-500" title={tx.txHash}>
+                      <p className="break-all font-mono text-xs text-slate-500" title={tx.txHash}>
                         {tx.txHash}
                       </p>
                     </td>

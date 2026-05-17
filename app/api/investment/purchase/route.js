@@ -1,5 +1,6 @@
 import { getSessionUser } from "@/lib/api/get-session-user";
 import { jsonError, jsonOk } from "@/lib/api/response";
+import { getNextProfitAt } from "@/lib/investment/profit-schedule";
 import { purchasePackage } from "@/lib/investment/purchase";
 
 export async function POST(request) {
@@ -20,8 +21,10 @@ export async function POST(request) {
       return jsonError(result.message);
     }
 
+    const nextProfit = getNextProfitAt(result.investment);
     return jsonOk({
-      message: `${result.package.name} activated — ${result.package.dailyProfit} USDT daily profit`,
+      message: `${result.package.name} activated — $${result.package.investment} deducted from wallet. First profit +$${result.package.dailyProfit} USDT in 24h.`,
+      nextProfitAt: nextProfit.toISOString(),
       investment: {
         id: result.investment._id.toString(),
         packageId: result.investment.packageId,

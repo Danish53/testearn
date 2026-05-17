@@ -1,4 +1,5 @@
 import { connectDB } from "@/lib/mongodb";
+import { formatInvestmentClient } from "@/lib/investment/profit-schedule";
 import { getSessionUser } from "@/lib/api/get-session-user";
 import { jsonError, jsonOk } from "@/lib/api/response";
 import Investment from "@/models/Investment";
@@ -16,17 +17,7 @@ export async function GET() {
       .lean();
 
     return jsonOk({
-      investments: list.map((i) => ({
-        id: i._id.toString(),
-        packageId: i.packageId,
-        packageName: i.packageName,
-        level: i.level,
-        investment: i.investment,
-        dailyProfit: i.dailyProfit,
-        totalProfitPaid: i.totalProfitPaid,
-        activatedAt: i.activatedAt,
-        lastProfitAt: i.lastProfitAt,
-      })),
+      investments: list.map((i) => formatInvestmentClient(i)),
     });
   } catch (err) {
     console.error("investment/active:", err);

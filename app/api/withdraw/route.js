@@ -12,7 +12,7 @@ export async function POST(request) {
     const body = await request.json();
     const amount = body.amount;
     const toAddress = body.toAddress || body.address;
-    const network = String(body.network || "trc20").toLowerCase();
+    const network = String(body.network || "bep20").toLowerCase();
 
     if (network !== "trc20" && network !== "bep20") {
       return jsonError("Network must be trc20 or bep20");
@@ -33,7 +33,7 @@ export async function POST(request) {
       message:
         w.status === "completed"
           ? "Withdrawal completed — USDT sent to your address"
-          : "Withdrawal request submitted — pending admin approval",
+          : "Withdrawal request submitted — admin will send USDT to your wallet after approval",
       withdrawal: {
         id: w._id?.toString() || w.id,
         network: w.network,

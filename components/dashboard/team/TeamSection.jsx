@@ -207,8 +207,8 @@ export default function TeamSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <div className="col-span-2 rounded-2xl border border-solar-accent/30 bg-gradient-to-br from-solar-accent/20 via-[#0b1018] to-[#0b1018] p-4 ring-1 ring-solar-accent/20 sm:flex sm:items-center sm:justify-between sm:p-5">
+      <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4">
+        <div className="min-[400px]:col-span-2 rounded-2xl border border-solar-accent/30 bg-gradient-to-br from-solar-accent/20 via-[#0b1018] to-[#0b1018] p-4 ring-1 ring-solar-accent/20 sm:flex sm:items-center sm:justify-between sm:p-5">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
               Total team
@@ -220,7 +220,7 @@ export default function TeamSection() {
               {team.directCount} direct · {team.teamSize - team.directCount} downline
             </p>
           </div>
-          <div className="mt-4 flex gap-6 sm:mt-0 sm:gap-10">
+          <div className="mt-4 flex flex-wrap gap-4 sm:mt-0 sm:gap-10">
             <div>
               <p className="text-[10px] font-semibold uppercase text-slate-500">Volume</p>
               <p className="text-lg font-bold tabular-nums text-solar-accent">
@@ -314,7 +314,7 @@ export default function TeamSection() {
       <section className={DASH.panel}>
         <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <h2 className={DASH.sectionTitle}>Team members</h2>
-          <div className="flex flex-wrap gap-1.5">
+          <div className={`${DASH.filterScroll} flex-wrap`}>
             {[
               { id: "all", label: "All" },
               { id: "1", label: "L1" },

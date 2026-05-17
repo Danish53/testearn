@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { KeyRound, Lock, Shield, Wallet } from "lucide-react";
 import CopyField from "@/components/dashboard/CopyField";
 import { useAppSelector } from "@/store/hooks";
+import { walletNetworksForUser } from "@/lib/wallet/networks";
 
 const NETWORK_UI = {
   trc20: {
@@ -86,7 +87,7 @@ export default function DashboardWalletCard() {
         </span>
       </div>
 
-      <div className="relative mb-4 grid gap-2 sm:grid-cols-3">
+      <div className="relative mb-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
         <div className="flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs text-slate-400">
           <KeyRound className="h-4 w-4 shrink-0 text-solar-accent" aria-hidden />
           <span>
@@ -102,12 +103,12 @@ export default function DashboardWalletCard() {
         <div className="flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs text-slate-400">
           <Wallet className="h-4 w-4 shrink-0 text-solar-accent" aria-hidden />
           <span>
-            <strong className="text-slate-300">Networks</strong> — USDT TRC20 + USDT BEP20
+            <strong className="text-slate-300">Networks</strong> — USDT BEP20 + USDT TRC20
           </span>
         </div>
       </div>
 
-      <div className="relative grid gap-4 lg:grid-cols-2">
+      <div className="relative grid grid-cols-1 gap-4 min-[480px]:grid-cols-2">
         {displayNetworks.map((net) => {
           const ui = NETWORK_UI[net.id] || NETWORK_UI.bep20;
           return (

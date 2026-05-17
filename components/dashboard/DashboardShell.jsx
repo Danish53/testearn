@@ -9,6 +9,7 @@ import { DASHBOARD_NAV, isNavActive, MOBILE_BOTTOM_NAV } from "@/components/dash
 import NavIcon from "@/components/dashboard/NavIcon";
 import DashboardUserFooter from "@/components/dashboard/DashboardUserFooter";
 import DashboardHeaderAvatar from "@/components/dashboard/DashboardHeaderAvatar";
+import DashboardWalletSync from "@/components/dashboard/DashboardWalletSync";
 
 /** Rounded brand mark — white tile + cyan “E” on dark sidebar */
 const BRAND_LOGO =
@@ -40,6 +41,8 @@ function SidebarNavLink({ item, onNavigate }) {
 export default function DashboardShell({ children }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const pageTitle =
+    DASHBOARD_NAV.find((n) => isNavActive(pathname, n.href))?.label || "Dashboard";
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -154,10 +157,13 @@ export default function DashboardShell({ children }) {
                 <Menu className="h-5 w-5" strokeWidth={1.75} />
               </button>
 
-              <div className="flex min-w-0 flex-1 justify-center px-0.5 sm:px-2">
-                <div className="relative w-full max-w-2xl">
+              <div className="flex min-w-0 flex-1 items-center justify-center px-1 sm:px-2">
+                <p className="truncate text-center text-sm font-semibold text-white sm:hidden">
+                  {pageTitle}
+                </p>
+                <div className="relative hidden w-full max-w-2xl sm:block">
                   <Search
-                    className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 sm:left-3.5 sm:h-[18px] sm:w-[18px]"
+                    className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-500"
                     strokeWidth={2}
                     aria-hidden
                   />
@@ -165,7 +171,7 @@ export default function DashboardShell({ children }) {
                     type="search"
                     name="dashboard-search"
                     placeholder="Search here"
-                    className="w-full rounded-full border border-white/10 bg-white/[0.06] py-2 pl-9 pr-3 text-xs text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-solar-accent/50 focus:bg-white/10 focus:ring-2 focus:ring-solar-accent/25 sm:py-2.5 sm:pl-10 sm:text-sm"
+                    className="w-full rounded-full border border-white/10 bg-white/[0.06] py-2.5 pl-10 pr-4 text-sm text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-solar-accent/50 focus:bg-white/10 focus:ring-2 focus:ring-solar-accent/25"
                     autoComplete="off"
                   />
                 </div>
@@ -175,7 +181,8 @@ export default function DashboardShell({ children }) {
             </div>
           </header>
 
-          <main className="flex-1 overflow-y-auto px-3 py-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:px-5 sm:py-6 lg:px-8 lg:pb-8">
+          <main className="flex min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 pb-[calc(5.75rem+env(safe-area-inset-bottom))] sm:px-5 sm:py-6 lg:px-8 lg:pb-8">
+            <DashboardWalletSync />
             {children}
           </main>
         </div>

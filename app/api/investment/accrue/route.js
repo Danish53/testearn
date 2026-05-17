@@ -14,8 +14,8 @@ export async function POST() {
     return jsonOk({
       message:
         result.credited > 0
-          ? `Daily profit credited: $${result.credited.toFixed(2)} USDT`
-          : "No new daily profit today (already credited or no active plans)",
+          ? `+$${result.credited.toFixed(2)} USDT added to your wallet balance`
+          : "No profit due yet — each plan pays every 24 hours",
       credited: result.credited,
       entries: result.entries,
       user: result.user?.toPublicJSON?.() ?? result.user,

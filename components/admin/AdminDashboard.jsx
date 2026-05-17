@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import {
   Activity,
@@ -201,7 +202,12 @@ export default function AdminDashboard() {
           </div>
           <div>
             <h2 className={ADMIN.sectionTitle}>Blockchain activity</h2>
-            <p className={ADMIN.sectionLead}>Recent deposits and withdrawals on-chain</p>
+            <p className={ADMIN.sectionLead}>
+              Recent on-chain activity —{" "}
+              <Link href="/admin/blockchain" className="text-solar-accent hover:underline">
+                full history & monitor
+              </Link>
+            </p>
           </div>
         </div>
         <AdminActivityFeed activity={a.blockchain.activity} />

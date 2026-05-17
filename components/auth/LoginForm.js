@@ -32,9 +32,8 @@ export default function LoginForm() {
         router.refresh();
         return;
       }
-      const dest =
-        from.startsWith("/dashboard") || from === "/dashboard" ? from : "/dashboard";
-      router.push(dest || "/dashboard");
+      const dest = from.startsWith("/dashboard") ? from : "/";
+      router.push(dest);
     } catch (err) {
       const msg = err?.message || "";
       if (msg.toLowerCase().includes("verify")) {

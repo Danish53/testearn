@@ -6,6 +6,11 @@ import { DASH } from "@/components/dashboard/dashboard-ui";
 import PageHeader from "@/components/dashboard/PageHeader";
 import { setUser } from "@/store/slices/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  DEFAULT_NETWORK_ID,
+  NETWORK_IDS,
+  networkTabLabel,
+} from "@/lib/wallet/networks";
 
 const FEE = 1;
 const MIN_WITHDRAW = 20;
@@ -25,7 +30,7 @@ function statusLabel(status) {
 export default function WithdrawSection() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
-  const [network, setNetwork] = useState("trc20");
+  const [network, setNetwork] = useState(DEFAULT_NETWORK_ID);
   const [amount, setAmount] = useState("");
   const [address, setAddress] = useState("");
   const [busy, setBusy] = useState(false);
@@ -93,10 +98,10 @@ export default function WithdrawSection() {
       <PageHeader
         icon={ArrowUpFromLine}
         title="Withdraw USDT"
-        lead="Enter amount and your external wallet (Trust Wallet, Binance, etc.). Balance is validated, then admin approves or auto-processing sends on-chain."
+        lead="Choose network (BEP20 or TRC20), amount, and your external wallet address. Admin sends USDT manually to your address, then approves — your balance is deducted when approved."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className={DASH.grid2}>
         <div className={DASH.card}>
           <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             Available balance
@@ -113,8 +118,8 @@ export default function WithdrawSection() {
         <div className={`${DASH.card} flex gap-3`}>
           <Info className="h-5 w-5 shrink-0 text-slate-500" aria-hidden />
           <p className="text-xs leading-relaxed text-slate-400">
-            Min ${MIN_WITHDRAW} USDT · Fee ${FEE} · Max $5,000/day · Auto-approve when enabled in
-            server config, otherwise admin approval then blockchain transfer.
+            Min ${MIN_WITHDRAW} USDT · Fee ${FEE} · Max $5,000/day · Balance is reserved until admin
+            sends USDT to your address and approves the request.
           </p>
         </div>
       </div>
@@ -135,15 +140,15 @@ export default function WithdrawSection() {
         <div className="space-y-4">
           <div>
             <p className={DASH.label}>Network type</p>
-            <div className="flex flex-wrap gap-2">
-              {["trc20", "bep20"].map((id) => (
+            <div className={DASH.filterScroll}>
+              {NETWORK_IDS.map((id) => (
                 <button
                   key={id}
                   type="button"
                   onClick={() => setNetwork(id)}
                   className={`${DASH.tab} ${network === id ? DASH.tabActive : DASH.tabIdle}`}
                 >
-                  USDT · {id === "trc20" ? "TRC20 · Tron" : "BEP20 · BSC"}
+                  USDT · {networkTabLabel(id)}
                 </button>
               ))}
             </div>

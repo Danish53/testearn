@@ -70,7 +70,7 @@ export default function RegisterForm() {
 
       <div className="rounded-lg border border-solar-accent/25 bg-solar-accent/10 px-3 py-2.5 text-xs leading-relaxed text-solar-text-muted">
         On signup we auto-create your{" "}
-        <span className="font-semibold text-solar-accent">USDT wallets</span> (TRC20 + BEP20):
+        <span className="font-semibold text-solar-accent">USDT wallets</span> (BEP20 + TRC20):
         deposit address, private key, and mnemonic — all encrypted. Verify email to access the
         dashboard.
       </div>

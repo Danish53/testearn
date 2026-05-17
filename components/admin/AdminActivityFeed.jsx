@@ -11,7 +11,10 @@ function shortHash(hash) {
 function statusClass(status) {
   const s = String(status || "").toLowerCase();
   if (s === "completed" || s === "credited") return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
-  if (s === "pending") return "border-amber-500/30 bg-amber-500/10 text-amber-300";
+  if (s === "pending" || s === "confirmed" || s === "processing")
+    return "border-amber-500/30 bg-amber-500/10 text-amber-300";
+  if (s === "failed" || s === "rejected" || s === "below_minimum")
+    return "border-red-500/30 bg-red-500/10 text-red-300";
   return "border-white/10 bg-white/5 text-slate-400";
 }
 

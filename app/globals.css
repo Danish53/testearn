@@ -238,3 +238,44 @@ aside.dash-sidebar .dash-sidebar-nav-scroll::-webkit-scrollbar-thumb {
 aside.dash-sidebar .dash-sidebar-nav-scroll::-webkit-scrollbar-thumb:hover {
   background: var(--solar-accent);
 }
+
+/* Dashboard — mobile-first helpers */
+@layer components {
+  .dash-filter-scroll {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+    scrollbar-width: none;
+  }
+
+  .dash-filter-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dash-filter-scroll > * {
+    flex-shrink: 0;
+  }
+
+  .dash-table-wrap {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 639px) {
+    aside.dash-sidebar .dash-sidebar-link {
+      margin-left: 0.75rem;
+      margin-right: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    aside.dash-sidebar .dash-sidebar-nav__item {
+      padding: 0.35rem 0;
+    }
+  }
+}

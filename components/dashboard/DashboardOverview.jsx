@@ -132,7 +132,7 @@ export default function DashboardOverview() {
         <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-slate-500">
           Dashboard features
         </h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           <StatCard
             label="Total balance"
             value={formatUsd(f.totalBalance)}
@@ -170,7 +170,7 @@ export default function DashboardOverview() {
         <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-slate-500">
           Dashboard cards
         </h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 sm:gap-4 lg:grid-cols-5">
           <StatCard label="Current balance" value={formatUsd(c.currentBalance)} icon={Wallet} />
           <StatCard label="Total invested" value={formatUsd(c.totalInvested)} icon={PiggyBank} />
           <StatCard
@@ -211,7 +211,7 @@ export default function DashboardOverview() {
 
       <TeamLevelsOverview levels={stats.teamLevels} />
 
-      <div className="flex flex-wrap gap-3">
+      <div className={DASH.btnRow}>
         <Link href="/dashboard/packages" className={DASH.btnSecondary}>
           Browse packages
         </Link>

@@ -2,19 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import {
-  Check,
-  Copy,
-  Eye,
-  EyeOff,
-  KeyRound,
-  Lock,
-  Loader2,
-  Pencil,
-  Shield,
-  UserRound,
-  Wallet,
-} from "lucide-react";
+import { Lock, Loader2, Pencil, Shield, UserRound, Wallet } from "lucide-react";
 import CopyField from "@/components/dashboard/CopyField";
 import { DASH } from "@/components/dashboard/dashboard-ui";
 import PageHeader from "@/components/dashboard/PageHeader";
@@ -24,13 +12,6 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 function avatarUrl(username, email) {
   const name = encodeURIComponent(username || email || "User");
   return `https://ui-avatars.com/api/?name=${name}&background=1facee&color=ffffff&size=128&bold=true`;
-}
-
-function mnemonicWords(phrase) {
-  return String(phrase || "")
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
 }
 
 export default function ProfileSection() {
@@ -50,17 +31,8 @@ export default function ProfileSection() {
   const [passwordMsg, setPasswordMsg] = useState("");
   const [passwordErr, setPasswordErr] = useState("");
 
-  const [mnemonic, setMnemonic] = useState("");
-  const [revealPassword, setRevealPassword] = useState("");
-  const [revealBusy, setRevealBusy] = useState(false);
-  const [revealErr, setRevealErr] = useState("");
-  const [phraseCopied, setPhraseCopied] = useState(false);
-
-  const phraseVisible = Boolean(mnemonic);
-  const words = mnemonicWords(mnemonic);
-
-  const trc20 = user?.wallet?.trc20Address || "";
   const bep20 = user?.wallet?.bep20Address || "";
+  const trc20 = user?.wallet?.trc20Address || "";
   const displayName = user?.username || "—";
 
   useEffect(() => {
@@ -128,56 +100,6 @@ export default function ProfileSection() {
     }
   }
 
-  function hideMnemonic() {
-    setMnemonic("");
-    setRevealPassword("");
-    setRevealErr("");
-    setPhraseCopied(false);
-  }
-
-  async function handleRevealMnemonic() {
-    setRevealErr("");
-    if (phraseVisible) {
-      hideMnemonic();
-      return;
-    }
-    if (!revealPassword) {
-      setRevealErr("Enter your account password to reveal the phrase");
-      return;
-    }
-    setRevealBusy(true);
-    try {
-      const res = await fetch("/api/user/mnemonic", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: revealPassword }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setRevealErr(data.message || "Could not load phrase");
-        return;
-      }
-      setMnemonic(data.mnemonic || "");
-      setRevealPassword("");
-    } catch {
-      setRevealErr("Could not load phrase");
-    } finally {
-      setRevealBusy(false);
-    }
-  }
-
-  async function copyMnemonic() {
-    if (!mnemonic) return;
-    try {
-      await navigator.clipboard.writeText(mnemonic);
-      setPhraseCopied(true);
-      window.setTimeout(() => setPhraseCopied(false), 2000);
-    } catch {
-      setRevealErr("Could not copy — copy manually or allow clipboard access");
-    }
-  }
-
   const profileDirty =
     user &&
     (username.trim().toLowerCase() !== (user.username || "") ||
@@ -188,7 +110,7 @@ export default function ProfileSection() {
       <PageHeader
         icon={UserRound}
         title="Profile & security"
-        lead="Update account details, change password, and manage wallet recovery."
+        lead="Update account details, change password, and view your deposit wallet addresses."
       />
 
       <div className={`flex flex-col items-center gap-6 sm:flex-row sm:items-start ${DASH.card}`}>
@@ -291,121 +213,26 @@ export default function ProfileSection() {
         </form>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className={DASH.card}>
-          <div className="mb-4 flex items-center gap-2">
-            <Wallet className="h-5 w-5 text-solar-accent" aria-hidden />
-            <h2 className="text-sm font-semibold text-white">Your deposit wallets</h2>
-          </div>
-          <div className="space-y-4">
-            {trc20 ? (
-              <CopyField label="TRC20 (Tron)" value={trc20} />
-            ) : (
-              <p className="text-sm text-slate-500">TRC20 wallet not provisioned yet.</p>
-            )}
-            {bep20 ? (
-              <CopyField label="BEP20 (BSC)" value={bep20} />
-            ) : (
-              <p className="text-sm text-slate-500">BEP20 wallet not provisioned yet.</p>
-            )}
-          </div>
+      <div className={DASH.card}>
+        <div className="mb-4 flex items-center gap-2">
+          <Wallet className="h-5 w-5 text-solar-accent" aria-hidden />
+          <h2 className="text-sm font-semibold text-white">Your deposit wallets</h2>
         </div>
-
-        <div className={DASH.card}>
-          <div className="mb-4 flex items-center gap-2">
-            <KeyRound className="h-5 w-5 text-amber-400" aria-hidden />
-            <h2 className="text-sm font-semibold text-white">Recovery phrase (12 words)</h2>
-          </div>
-          <p className="mb-3 text-xs text-slate-500">
-            Controls your deposit wallets. Write it offline once — never share it. Staff will never
-            ask for it.
-          </p>
-          {!phraseVisible ? (
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {Array.from({ length: 12 }, (_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-lg border border-white/10 bg-black/25 px-2 py-2 text-center"
-                  >
-                    <span className="text-[10px] text-slate-600">{i + 1}.</span>
-                    <p className="mt-0.5 font-mono text-xs tracking-widest text-slate-600">•••••</p>
-                  </div>
-                ))}
-              </div>
-              <input
-                type="password"
-                className={DASH.input}
-                placeholder="Account password to reveal"
-                value={revealPassword}
-                onChange={(e) => setRevealPassword(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleRevealMnemonic();
-                  }
-                }}
-                autoComplete="current-password"
-              />
-            </div>
+        <div className="space-y-4">
+          {bep20 ? (
+            <CopyField label="BEP20 (BSC)" value={bep20} />
           ) : (
-            <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-4">
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {words.map((word, i) => (
-                  <div
-                    key={`${i}-${word}`}
-                    className="rounded-lg border border-amber-500/20 bg-black/20 px-2 py-2"
-                  >
-                    <span className="text-[10px] font-semibold text-amber-400/80">{i + 1}.</span>
-                    <p className="font-mono text-xs text-amber-50">{word}</p>
-                  </div>
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={copyMnemonic}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/15 px-3 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/25"
-              >
-                {phraseCopied ? (
-                  <>
-                    <Check className="h-3.5 w-3.5" aria-hidden /> Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3.5 w-3.5" aria-hidden /> Copy phrase
-                  </>
-                )}
-              </button>
-            </div>
+            <p className="text-sm text-slate-500">BEP20 wallet not provisioned yet.</p>
           )}
-
-          {revealErr ? (
-            <p className="mt-2 text-xs text-red-400" role="alert">
-              {revealErr}
-            </p>
-          ) : null}
-          <button
-            type="button"
-            onClick={handleRevealMnemonic}
-            disabled={revealBusy}
-            className="mt-3 flex items-center gap-2 text-xs font-semibold text-amber-300 hover:text-amber-200 disabled:opacity-60"
-          >
-            {revealBusy ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                Verifying…
-              </>
-            ) : phraseVisible ? (
-              <>
-                <EyeOff className="h-4 w-4" aria-hidden /> Hide phrase
-              </>
-            ) : (
-              <>
-                <Eye className="h-4 w-4" aria-hidden /> Reveal phrase
-              </>
-            )}
-          </button>
+          {trc20 ? (
+            <CopyField label="TRC20 (Tron)" value={trc20} />
+          ) : (
+            <p className="text-sm text-slate-500">TRC20 wallet not provisioned yet.</p>
+          )}
         </div>
+        <p className="mt-4 text-xs text-slate-500">
+          Wallet recovery phrase is held securely by the platform administrator.
+        </p>
       </div>
 
       <div className={DASH.card}>
