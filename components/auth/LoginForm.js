@@ -28,12 +28,13 @@ export default function LoginForm() {
       const from = searchParams.get("from") || "";
       if (result?.role === "admin") {
         const dest = from.startsWith("/admin") ? from : "/admin";
-        router.push(dest);
         router.refresh();
+        router.replace(dest);
         return;
       }
       const dest = from.startsWith("/dashboard") ? from : "/";
-      router.push(dest);
+      router.refresh();
+      router.replace(dest);
     } catch (err) {
       const msg = err?.message || "";
       if (msg.toLowerCase().includes("verify")) {
