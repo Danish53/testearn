@@ -73,11 +73,15 @@ export const CLIENTS = [
   },
 ];
 
-function ClientCard({ name, role, region, blurb, image }) {
+function ClientCard({ name, role, region, blurb, image, dark = false }) {
   return (
     <article
       data-client-card
-      className="flex w-[min(88vw,300px)] shrink-0 snap-start snap-always flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-[0_12px_40px_-24px_rgba(15,23,42,0.15)] sm:w-[320px]"
+      className={`flex w-[min(88vw,300px)] shrink-0 snap-start snap-always flex-col overflow-hidden rounded-xl border shadow-[0_12px_40px_-24px_rgba(15,23,42,0.15)] sm:w-[320px] ${
+        dark
+          ? "border-white/10 bg-white/[0.04]"
+          : "border-slate-200/90 bg-white"
+      }`}
     >
       <div className="relative aspect-[16/10] w-full bg-slate-200">
         <Image
@@ -93,11 +97,19 @@ function ClientCard({ name, role, region, blurb, image }) {
         </p>
       </div>
       <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <h3 className="line-clamp-2 text-sm font-semibold leading-snug tracking-tight text-slate-900 sm:text-base">
+        <h3
+          className={`line-clamp-2 text-sm font-semibold leading-snug tracking-tight sm:text-base ${
+            dark ? "text-solar-text" : "text-slate-900"
+          }`}
+        >
           {name}
         </h3>
         <p className="mt-1 text-xs font-medium text-solar-accent">{role}</p>
-        <p className="mt-3 line-clamp-3 text-[11px] leading-relaxed text-slate-600 sm:text-xs">
+        <p
+          className={`mt-3 line-clamp-3 text-[11px] leading-relaxed sm:text-xs ${
+            dark ? "text-solar-text-muted" : "text-slate-600"
+          }`}
+        >
           {blurb}
         </p>
       </div>
@@ -105,8 +117,9 @@ function ClientCard({ name, role, region, blurb, image }) {
   );
 }
 
-export default function ClientMarquee() {
+export default function ClientMarquee({ staticOnly = false, dark = false }) {
   const reduce = useReducedMotion();
+  const useStatic = staticOnly || reduce;
   const scrollRef = useRef(null);
   const [paused, setPaused] = useState(false);
   const loop = [...CLIENTS, ...CLIENTS];
@@ -153,7 +166,7 @@ export default function ClientMarquee() {
   }, [setWidthHalf, stepSize]);
 
   useEffect(() => {
-    if (reduce || paused) return;
+    if (useStatic || paused) return;
     const el = scrollRef.current;
     if (!el) return;
     let raf = 0;
@@ -172,13 +185,13 @@ export default function ClientMarquee() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reduce, paused]);
+  }, [useStatic, paused]);
 
-  if (reduce) {
+  if (useStatic) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CLIENTS.slice(0, 6).map((c) => (
-          <ClientCard key={c.name} {...c} />
+          <ClientCard key={c.name} {...c} dark={dark} />
         ))}
       </div>
     );

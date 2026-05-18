@@ -8,6 +8,7 @@ import { Menu, Search, X } from "lucide-react";
 import { DASHBOARD_NAV, isNavActive, MOBILE_BOTTOM_NAV } from "@/components/dashboard/nav-items";
 import NavIcon from "@/components/dashboard/NavIcon";
 import DashboardUserFooter from "@/components/dashboard/DashboardUserFooter";
+import DashboardActivePlanBadge from "@/components/dashboard/DashboardActivePlanBadge";
 import DashboardHeaderAvatar from "@/components/dashboard/DashboardHeaderAvatar";
 import DashboardWalletSync from "@/components/dashboard/DashboardWalletSync";
 
@@ -61,7 +62,7 @@ export default function DashboardShell({ children }) {
 
   const sidebarBrand = (
     <Link
-      href="/"
+      href="/dashboard"
       onClick={closeDrawer}
       className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-solar-accent/50"
     >
@@ -177,11 +178,14 @@ export default function DashboardShell({ children }) {
                 </div>
               </div>
 
-              <DashboardHeaderAvatar />
+              <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+                <DashboardActivePlanBadge />
+                <DashboardHeaderAvatar />
+              </div>
             </div>
           </header>
 
-          <main className="flex min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 pb-[calc(5.75rem+env(safe-area-inset-bottom))] sm:px-5 sm:py-6 lg:px-8 lg:pb-8">
+          <main className="flex min-w-0 flex-1 overflow-x-hidden overflow-y-auto ">
             <DashboardWalletSync />
             {children}
           </main>

@@ -1,9 +1,13 @@
-import DashboardOverview from "@/components/dashboard/DashboardOverview";
+import DashboardHomeContent from "@/components/dashboard/DashboardHomeContent";
 
 export const metadata = {
-  title: "Overview",
+  title: "Home",
 };
 
 export default function DashboardHomePage() {
-  return <DashboardOverview />;
+  return (
+    <div className="dash-overview-landing">
+      <DashboardHomeContent />
+    </div>
+  );
 }

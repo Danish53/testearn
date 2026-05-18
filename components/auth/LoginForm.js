@@ -32,7 +32,7 @@ export default function LoginForm() {
         router.replace(dest);
         return;
       }
-      const dest = from.startsWith("/dashboard") ? from : "/";
+      const dest = from.startsWith("/dashboard/") ? from : "/dashboard";
       router.refresh();
       router.replace(dest);
     } catch (err) {

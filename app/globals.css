@@ -279,3 +279,12 @@ aside.dash-sidebar .dash-sidebar-nav-scroll::-webkit-scrollbar-thumb:hover {
     }
   }
 }
+
+/* Dashboard home — full-bleed landing inside shell */
+.dash-overview-landing {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  /* background: #000; */
+}
+

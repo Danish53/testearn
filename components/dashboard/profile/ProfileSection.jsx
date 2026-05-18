@@ -18,7 +18,6 @@ export default function ProfileSection() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
 
-  const [username, setUsername] = useState(user?.username || "");
   const [email, setEmail] = useState(user?.email || "");
   const [profileBusy, setProfileBusy] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
@@ -36,11 +35,8 @@ export default function ProfileSection() {
   const displayName = user?.username || "—";
 
   useEffect(() => {
-    if (user) {
-      setUsername(user.username || "");
-      setEmail(user.email || "");
-    }
-  }, [user?.username, user?.email]);
+    if (user) setEmail(user.email || "");
+  }, [user?.email]);
 
   async function handleProfileSubmit(e) {
     e.preventDefault();
@@ -52,7 +48,7 @@ export default function ProfileSection() {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username.trim(), email: email.trim() }),
+        body: JSON.stringify({ email: email.trim() }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -101,9 +97,7 @@ export default function ProfileSection() {
   }
 
   const profileDirty =
-    user &&
-    (username.trim().toLowerCase() !== (user.username || "") ||
-      email.trim().toLowerCase() !== (user.email || ""));
+    user && email.trim().toLowerCase() !== (user.email || "").toLowerCase();
 
   return (
     <div className={DASH.wrap}>
@@ -160,17 +154,13 @@ export default function ProfileSection() {
             <input
               id="profile-username"
               type="text"
-              className={DASH.input}
-              value={username}
-              onChange={(e) =>
-                setUsername(e.target.value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase())
-              }
+              readOnly
+              className={`${DASH.input} cursor-not-allowed opacity-80`}
+              value={user?.username || ""}
               autoComplete="username"
-              minLength={3}
-              maxLength={32}
             />
             <p className="mt-1 text-xs text-slate-500">
-              Changing username updates your referral code for new signups.
+              Username is fixed at registration and cannot be changed.
             </p>
           </div>
           <div>

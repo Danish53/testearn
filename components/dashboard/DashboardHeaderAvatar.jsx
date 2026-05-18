@@ -12,7 +12,7 @@ export default function DashboardHeaderAvatar() {
   return (
     <Link
       href="/dashboard/profile"
-      className="relative ml-auto h-9 w-9 shrink-0 overflow-hidden rounded-full ring-2 ring-solar-accent/50 sm:h-11 sm:w-11"
+      className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full ring-2 ring-solar-accent/50 sm:h-11 sm:w-11"
     >
       <Image src={src} alt={name} fill className="object-cover" sizes="44px" />
     </Link>

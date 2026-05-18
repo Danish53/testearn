@@ -2,7 +2,7 @@
 export const DASHBOARD_NAV = [
   {
     href: "/dashboard",
-    label: "Overview",
+    label: "Home",
     shortLabel: "Home",
     key: "overview",
   },

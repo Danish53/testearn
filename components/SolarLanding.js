@@ -34,6 +34,11 @@ const facts = [
   { label: "CO₂ avoided", value: "Tonnes / yr" },
 ];
 
+/** Dashboard home: no motion props, black sections, tighter top spacing */
+function animProps(embedded, props) {
+  return embedded ? {} : props;
+}
+
 function MediaFrame({ children, className = "" }) {
   return (
     <div
@@ -126,13 +131,32 @@ function ShowcaseEditorial({
   );
 }
 
-export default function SolarLanding() {
-  const reduce = useReducedMotion();
+export default function SolarLanding({ embedded = false }) {
+  const reduceMotion = useReducedMotion();
+  const reduce = embedded || reduceMotion;
   const vFadeUp = fadeUp(reduce);
   const vFadeUpSm = fadeUp(reduce, 22);
   const vScale = fadeScale(reduce);
   const vSlideL = slideAxis(reduce, reduce ? 0 : -44);
   const vSlideR = slideAxis(reduce, reduce ? 0 : 44);
+
+  const darkSection =
+    "section-frame relative overflow-hidden border-b border-white/10 bg-black";
+  const darkSectionDefault =
+    "section-frame relative overflow-hidden border-b border-solar-border bg-solar-bg-deep";
+  const lightSection = embedded
+    ? darkSection
+    : "section-frame-light relative bg-white";
+  const sectionPy = embedded ? "py-12 sm:py-16 lg:py-20" : "py-14 sm:py-20 lg:py-28";
+  const sectionPyMd = embedded ? "py-12 sm:py-14 lg:py-16" : "py-14 sm:py-16 lg:py-24";
+  const heroInner = embedded
+    ? "relative mx-auto max-w-7xl px-4 pb-12 pt-0 sm:px-5 sm:pb-14 sm:pt-1 md:px-6 lg:px-8"
+    : "relative mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-5 sm:pb-20 sm:pt-24 md:px-6 lg:px-8 lg:pb-24 lg:pt-28";
+  const ink = embedded ? "text-solar-text" : "text-slate-900";
+  const inkMuted = embedded ? "text-solar-text-muted" : "text-slate-600";
+  const cardOnLight = embedded
+    ? "border-white/10 bg-white/[0.04]"
+    : "border-slate-200 bg-slate-50";
 
   const heroParent = {
     hidden: {},
@@ -164,22 +188,30 @@ export default function SolarLanding() {
   };
 
   return (
-    <div className="flex min-h-0 w-full max-w-[100vw] flex-col">
+    <div
+      className={`flex min-h-0 w-full flex-col ${
+        embedded ? "dash-landing-embed overflow-x-hidden bg-black" : "max-w-[100vw]"
+      }`}
+    >
       {/* Hero — split layout + flagship solar imagery */}
-      <section className="section-frame relative overflow-hidden border-b border-solar-border bg-solar-bg-deep">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-50"
-          style={{
-            background:
-              "radial-gradient(ellipse 85% 55% at 15% 20%, var(--solar-glow), transparent 50%), radial-gradient(ellipse 70% 50% at 100% 0%, color-mix(in srgb, var(--solar-accent) 12%, transparent), transparent 45%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-5 sm:pb-20 sm:pt-24 md:px-6 lg:px-8 lg:pb-24 lg:pt-28">
+      <section className={embedded ? darkSection : darkSectionDefault}>
+        {!embedded ? (
+          <div
+            className="pointer-events-none absolute inset-0 opacity-50"
+            style={{
+              background:
+                "radial-gradient(ellipse 85% 55% at 15% 20%, var(--solar-glow), transparent 50%), radial-gradient(ellipse 70% 50% at 100% 0%, color-mix(in srgb, var(--solar-accent) 12%, transparent), transparent 45%)",
+            }}
+          />
+        ) : null}
+        <div className={heroInner}>
           <div
             className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-14"
-            variants={heroParent}
-            initial="hidden"
-            animate="visible"
+            {...animProps(embedded, {
+              variants: heroParent,
+              initial: "hidden",
+              animate: "visible",
+            })}
           >
             {/* Copy column */}
             <div
@@ -314,7 +346,7 @@ export default function SolarLanding() {
       </section>
 
       {/* Visual strip — light band */}
-      <section className="section-frame-light relative bg-white py-14 sm:py-16 lg:py-24">
+      <section className={`${lightSection} ${sectionPyMd}`}>
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.5]"
           style={{
@@ -395,7 +427,7 @@ export default function SolarLanding() {
                 subline="Wide rows, tracker-ready spacing, and clean sightlines—built for portfolios that care about yield and land stewardship."
                 tag="Featured"
                 priority
-                disableZoom={reduce}
+                disableZoom={embedded || reduce}
               />
             </div>
 
@@ -416,7 +448,7 @@ export default function SolarLanding() {
                   headline="Precision installs on real homes"
                   subline="Flush arrays, hidden conduit runs, and inverter placement that respects your roofline—where craft meets kilowatts."
                   tag="Residential"
-                  disableZoom={reduce}
+                  disableZoom={embedded || reduce}
                 />
               </div>
 
@@ -461,9 +493,11 @@ export default function SolarLanding() {
                     </span>
                   </div>
                   <div
-                    whileHover={reduce ? {} : { scale: 1.02 }}
-                    whileTap={reduce ? {} : { scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 420, damping: 28 }}
+                    {...animProps(embedded, {
+                      whileHover: { scale: 1.02 },
+                      whileTap: { scale: 0.98 },
+                      transition: { type: "spring", stiffness: 420, damping: 28 },
+                    })}
                     className="mt-6 sm:mt-7"
                   >
                     <Link
@@ -480,7 +514,7 @@ export default function SolarLanding() {
       </section>
 
       {/* Why solar — dark band */}
-      <section className="section-frame border-b border-solar-border bg-solar-bg-deep py-14 sm:py-20 lg:py-28">
+      <section className={`${embedded ? darkSection : "section-frame border-b border-solar-border bg-solar-bg-deep"} ${sectionPy}`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-6 lg:px-8">
           <div
             className="max-w-2xl"
@@ -510,15 +544,13 @@ export default function SolarLanding() {
               <li
                 key={item.title}
                 variants={cardItem}
-                whileHover={
-                  reduce
-                    ? {}
-                    : {
-                        y: -4,
-                        borderColor: "rgba(31, 172, 238, 0.35)",
-                        transition: { duration: 0.22, ease: EASE_OUT },
-                      }
-                }
+                {...animProps(embedded, {
+                  whileHover: {
+                    y: -4,
+                    borderColor: "rgba(31, 172, 238, 0.35)",
+                    transition: { duration: 0.22, ease: EASE_OUT },
+                  },
+                })}
                 className="rounded-xl border border-solar-border bg-solar-bg-card/90 p-5 transition-colors sm:p-6"
               >
                 <div className="mb-4 h-1 w-12 rounded-full bg-gradient-to-r from-solar-accent to-solar-accent-strong" />
@@ -535,7 +567,7 @@ export default function SolarLanding() {
       </section>
 
       {/* Image + stats — light band */}
-      <section className="section-frame-light border-y border-slate-200 bg-white py-14 sm:py-20 lg:py-28">
+      <section className={`${lightSection} border-y ${embedded ? "border-white/10" : "border-slate-200"} ${sectionPy}`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-5 md:px-6 lg:px-8">
           <div className="grid items-center gap-10 text-slate-900 sm:gap-12 lg:grid-cols-2 lg:gap-16">
             <div
@@ -602,7 +634,7 @@ export default function SolarLanding() {
       </section>
 
       {/* Clients — animated marquee */}
-      <section className="section-frame-light relative overflow-hidden border-y border-slate-200 bg-slate-50 py-14 sm:py-16 lg:py-20">
+      <section className={`${lightSection} relative overflow-hidden border-y ${embedded ? "border-white/10" : "border-slate-200"} ${sectionPyMd}`}>
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.35]"
           style={{
@@ -635,7 +667,7 @@ export default function SolarLanding() {
             viewport={VIEWPORT}
             transition={{ duration: reduce ? 0 : 0.55, ease: EASE_OUT }}
           >
-            <ClientMarquee />
+            <ClientMarquee staticOnly={embedded} dark={embedded} />
           </div>
         </div>
       </section>
@@ -683,9 +715,11 @@ export default function SolarLanding() {
                 </p>
                 <div variants={vFadeUpSm} className="mt-8 sm:mt-10">
                   <div
-                    whileHover={reduce ? {} : { scale: 1.03 }}
-                    whileTap={reduce ? {} : { scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                    {...animProps(embedded, {
+                      whileHover: { scale: 1.03 },
+                      whileTap: { scale: 0.97 },
+                      transition: { type: "spring", stiffness: 400, damping: 22 },
+                    })}
                     className="inline-block"
                   >
                     <Link
@@ -704,11 +738,13 @@ export default function SolarLanding() {
       </section>
 
       <footer
-        className="section-frame relative border-t border-white/[0.06] bg-solar-bg-deep px-4 py-12 sm:px-6 sm:py-14 lg:px-8"
-        initial="hidden"
-        whileInView="visible"
-        viewport={VIEWPORT}
-        variants={fadeUp(reduce, 12)}
+        className={`section-frame relative border-t border-white/[0.06] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 ${embedded ? "bg-black" : "bg-solar-bg-deep"}`}
+        {...animProps(embedded, {
+          initial: "hidden",
+          whileInView: "visible",
+          viewport: VIEWPORT,
+          variants: fadeUp(reduce, 12),
+        })}
       >
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-solar-accent/30 to-transparent"
@@ -732,12 +768,17 @@ export default function SolarLanding() {
               className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-solar-border pt-6 text-sm font-medium text-solar-text-muted sm:justify-end sm:border-t-0 sm:pt-0"
               aria-label="Footer"
             >
-              <Link href="/dashboard" className="transition hover:text-solar-accent">
-                Dashboard
+              <Link href="/dashboard/packages" className="transition hover:text-solar-accent">
+                Packages
               </Link>
-              <Link href="/" className="transition hover:text-solar-accent">
-                Home
+              <Link href="/dashboard/deposit" className="transition hover:text-solar-accent">
+                Deposit
               </Link>
+              {!embedded ? (
+                <Link href="/login" className="transition hover:text-solar-accent">
+                  Login
+                </Link>
+              ) : null}
             </nav>
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-solar-border pt-8 text-center sm:flex-row sm:text-left">

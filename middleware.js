@@ -62,14 +62,21 @@ export async function middleware(request) {
 
   const loggedIn = await hasValidUserSession(request);
 
+  if (pathname === "/") {
+    if (!loggedIn) {
+      return loginRedirect(request, pathname);
+    }
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   if (isPublicPath(pathname)) {
     if (loggedIn) {
-      return NextResponse.redirect(new URL("/", request.url));
+      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
     return NextResponse.next();
   }
 
-  if (pathname === "/" || pathname.startsWith("/dashboard")) {
+  if (pathname.startsWith("/dashboard")) {
     if (!loggedIn) {
       return loginRedirect(request, pathname);
     }

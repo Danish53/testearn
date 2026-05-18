@@ -1,13 +1,6 @@
-import Navbar from "@/components/Navbar";
-import SolarLanding from "@/components/SolarLanding";
+import { redirect } from "next/navigation";
 
+/** Guests are sent to login via middleware; logged-in users go to /dashboard. */
 export default function Home() {
-  return (
-    <>
-      <Navbar />
-      <main className="flex-1">
-        <SolarLanding />
-      </main>
-    </>
-  );
+  redirect("/login");
 }

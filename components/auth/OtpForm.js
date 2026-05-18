@@ -65,7 +65,7 @@ export default function OtpForm() {
     try {
       await dispatch(verifyOtp({ email, otp })).unwrap();
       router.refresh();
-      router.replace("/");
+      router.replace("/dashboard");
     } catch {
       /* redux error */
     }
