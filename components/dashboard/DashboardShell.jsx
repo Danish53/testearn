@@ -185,7 +185,7 @@ export default function DashboardShell({ children }) {
             </div>
           </header>
 
-          <main className="flex min-w-0 flex-1 overflow-x-hidden overflow-y-auto ">
+          <main className="flex min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto px-4 py-5 pb-[calc(6.25rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-7 lg:px-8 lg:pb-8">
             <DashboardWalletSync />
             {children}
           </main>

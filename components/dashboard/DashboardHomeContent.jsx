@@ -42,7 +42,7 @@ function Eyebrow({ children, center = false }) {
 function HomeSection({ children, className = "" }) {
   return (
     <section className={`border-b border-white/10 bg-black ${className}`}>
-      <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-5 sm:py-12 md:px-6 lg:px-8 lg:py-14">
+      <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-5 sm:py-14 md:px-6 lg:px-8 lg:py-16">
         {children}
       </div>
     </section>
@@ -76,8 +76,8 @@ function ShowcaseCard({ src, alt, tag, title }) {
 export default function DashboardHomeContent() {
   return (
     <div className="w-full min-w-0 text-solar-text">
-      <HomeSection className="!pb-8 !pt-1 sm:!pt-2">
-        <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-10">
+      <HomeSection className="!pb-10 !pt-3 sm:!pt-4">
+        <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
           <div className="order-2 min-w-0 lg:order-1 lg:col-span-5">
             <Eyebrow>Welcome</Eyebrow>
             <h1 className="text-balance text-2xl font-bold uppercase leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
@@ -125,7 +125,7 @@ export default function DashboardHomeContent() {
         <h2 className="text-lg font-bold uppercase tracking-tight text-white sm:text-xl">
           Your dashboard tools
         </h2>
-        <ul className="mt-6 grid gap-3 sm:grid-cols-3 sm:gap-4">
+        <ul className="mt-8 grid gap-4 sm:grid-cols-3 sm:gap-5">
           {[
             {
               href: "/dashboard/packages",
@@ -171,7 +171,7 @@ export default function DashboardHomeContent() {
           From rooftop arrays to utility-scale fields—the same clean energy story at every
           scale.
         </p>
-        <div className="mt-8 grid gap-5 sm:gap-6 lg:grid-cols-2">
+        <div className="mt-10 grid gap-6 sm:gap-7 lg:grid-cols-2">
           <ShowcaseCard
             src={SOLAR_IMAGES.heroWide}
             alt="Utility-scale solar"
@@ -192,7 +192,7 @@ export default function DashboardHomeContent() {
         <h2 className="text-lg font-bold uppercase tracking-tight text-white sm:text-2xl">
           Why solar matters
         </h2>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+        <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {benefits.map((item) => (
             <li
               key={item.title}
@@ -207,7 +207,7 @@ export default function DashboardHomeContent() {
       </HomeSection>
 
       <HomeSection>
-        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
           <div className="relative aspect-[4/3] min-h-[200px] overflow-hidden rounded-xl ring-1 ring-white/10 sm:aspect-[16/10]">
             <Image
               src={SOLAR_IMAGES.install}
@@ -255,13 +255,13 @@ export default function DashboardHomeContent() {
             Installers and portfolio owners who rely on transparent production data.
           </p>
         </div>
-        <div className="mt-8 min-w-0 overflow-hidden">
+        <div className="mt-10 min-w-0 overflow-hidden">
           <ClientMarquee staticOnly dark />
         </div>
       </HomeSection>
 
-      <section className="bg-black px-4 py-10 sm:px-5 sm:py-12 md:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-10 text-center sm:px-8 sm:py-12">
+      <section className="bg-black px-4 py-12 sm:px-5 sm:py-14 md:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-12 text-center sm:px-10 sm:py-14">
           <Eyebrow center>Next step</Eyebrow>
           <h2 className="text-lg font-bold uppercase tracking-tight text-white sm:text-2xl">
             Ready to earn?
