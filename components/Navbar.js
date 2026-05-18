@@ -34,8 +34,8 @@ export default function Navbar() {
 
   async function handleLogout() {
     await dispatch(logoutUser());
-    router.push("/login");
     router.refresh();
+    router.replace("/login");
   }
 
   const showAuthed = hydrated && isAuthenticated && user;

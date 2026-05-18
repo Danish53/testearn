@@ -12,7 +12,8 @@ export default function LogoutButton({ className = "" }) {
 
   async function handleLogout() {
     await dispatch(logoutUser());
-    router.push("/login");
+    router.refresh();
+    router.replace("/login");
   }
 
   return (

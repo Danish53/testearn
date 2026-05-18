@@ -232,17 +232,11 @@ export default function SolarLanding() {
                 className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
               >
                 <Link
-                  href="/login"
+                  href="/dashboard"
                   className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-solar-accent to-solar-accent-strong px-8 text-sm font-semibold text-solar-foreground-on-accent shadow-lg shadow-solar-accent/25 transition hover:brightness-110 sm:w-auto"
                 >
-                  Get started
+                  Open dashboard
                   <span aria-hidden>→</span>
-                </Link>
-                <Link
-                  href="/register"
-                  className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border border-solar-border bg-solar-bg-card/60 px-8 text-sm font-semibold text-solar-text backdrop-blur-sm transition hover:border-solar-accent/40 hover:bg-solar-bg-card sm:w-auto"
-                >
-                  Create account
                 </Link>
               </div>
 
@@ -473,10 +467,10 @@ export default function SolarLanding() {
                     className="mt-6 sm:mt-7"
                   >
                     <Link
-                      href="/login"
+                      href="/dashboard"
                       className="inline-flex w-full min-h-[46px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-solar-accent to-solar-accent-strong px-6 py-3 text-sm font-semibold text-solar-foreground-on-accent shadow-lg shadow-solar-accent/25 transition hover:brightness-110 sm:w-auto sm:px-9"
                     >
-                      Continue with Login
+                      Go to dashboard
                       <span aria-hidden>→</span>
                     </Link>
                   </div>
@@ -684,8 +678,8 @@ export default function SolarLanding() {
                   variants={vFadeUp}
                   className="mx-auto mt-4 max-w-xl text-sm text-solar-text-muted sm:text-base md:text-lg"
                 >
-                  Explore solar fundamentals here, then log in to open your
-                  dashboard and track earnings-focused metrics in one place.
+                  Explore solar fundamentals here, then open your dashboard to
+                  track deposits, packages, and earnings in one place.
                 </p>
                 <div variants={vFadeUpSm} className="mt-8 sm:mt-10">
                   <div
@@ -695,10 +689,10 @@ export default function SolarLanding() {
                     className="inline-block"
                   >
                     <Link
-                      href="/login"
+                      href="/dashboard"
                       className="inline-flex min-h-[46px] items-center gap-2 rounded-full bg-solar-text px-8 py-3 text-sm font-semibold text-solar-foreground-on-accent shadow-lg shadow-black/35 transition-colors hover:bg-white sm:text-base"
                     >
-                      Login to dashboard
+                      Open dashboard
                       <span aria-hidden>→</span>
                     </Link>
                   </div>
@@ -743,12 +737,6 @@ export default function SolarLanding() {
               </Link>
               <Link href="/" className="transition hover:text-solar-accent">
                 Home
-              </Link>
-              <Link href="/login" className="transition hover:text-solar-accent">
-                Login
-              </Link>
-              <Link href="/register" className="transition hover:text-solar-accent">
-                Register
               </Link>
             </nav>
           </div>

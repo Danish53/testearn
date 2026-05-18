@@ -64,7 +64,8 @@ export default function OtpForm() {
     dispatch(clearAuthError());
     try {
       await dispatch(verifyOtp({ email, otp })).unwrap();
-      router.push("/");
+      router.refresh();
+      router.replace("/");
     } catch {
       /* redux error */
     }
@@ -123,7 +124,7 @@ export default function OtpForm() {
         disabled={loading || digits.join("").length !== OTP_LENGTH}
         className="flex w-full min-h-[50px] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-solar-accent to-solar-accent-strong px-6 text-sm font-semibold text-solar-foreground-on-accent shadow-lg shadow-solar-accent/25 transition hover:brightness-110 disabled:opacity-60"
       >
-        {loading ? "Verifying…" : "Verify & open dashboard"}
+        {loading ? "Verifying…" : "Verify & continue"}
       </button>
 
       <button

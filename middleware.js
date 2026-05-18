@@ -8,7 +8,9 @@ const PUBLIC_PATHS = ["/login", "/register", "/verify-otp"];
 
 function loginRedirect(request, pathname) {
   const login = new URL("/login", request.url);
-  login.searchParams.set("from", pathname);
+  if (pathname && pathname !== "/") {
+    login.searchParams.set("from", pathname);
+  }
   return NextResponse.redirect(login);
 }
 
@@ -61,7 +63,7 @@ export async function middleware(request) {
   const loggedIn = await hasValidUserSession(request);
 
   if (isPublicPath(pathname)) {
-    if (loggedIn && pathname === "/login") {
+    if (loggedIn) {
       return NextResponse.redirect(new URL("/", request.url));
     }
     return NextResponse.next();
