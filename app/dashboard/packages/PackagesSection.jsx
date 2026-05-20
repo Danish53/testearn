@@ -6,12 +6,10 @@ import {
   Check,
   Crown,
   DollarSign,
-  GitBranch,
   Loader2,
   Package,
   Sparkles,
   TrendingUp,
-  Users,
 } from "lucide-react";
 import { PACKAGES } from "@/components/dashboard/packages-data";
 import { DASH } from "@/components/dashboard/dashboard-ui";
@@ -23,6 +21,7 @@ function formatUsd(amount) {
   return `$${amount.toLocaleString("en-US")}`;
 }
 
+/* Referral commission UI — hidden per product request
 function CommissionPill({ label, value, variant }) {
   const styles =
     variant === "direct"
@@ -40,6 +39,7 @@ function CommissionPill({ label, value, variant }) {
     </div>
   );
 }
+*/
 
 function PackageCard({ pkg, busy, balance, onBuy }) {
   const canAfford = balance >= pkg.investment;
@@ -103,6 +103,7 @@ function PackageCard({ pkg, busy, balance, onBuy }) {
       </div>
 
       <div className="flex flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
+        {/* Referral commission — commented out
         <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
           <Users className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
           Referral commission
@@ -111,8 +112,9 @@ function PackageCard({ pkg, busy, balance, onBuy }) {
           <CommissionPill label="Direct" value={pkg.directPercent} variant="direct" />
           <CommissionPill label="Indirect" value={pkg.indirectPercent} variant="indirect" />
         </div>
+        */}
 
-        <ul className="mt-4 space-y-2 border-t border-white/[0.06] pt-4 text-sm text-slate-400">
+        <ul className="space-y-2 text-sm text-slate-400">
           <li className="flex gap-2">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-solar-accent" strokeWidth={2} />
             Deducted from wallet balance instantly
@@ -289,7 +291,7 @@ export default function PackagesSection() {
       ) : null}
 
       <section className={`relative ${DASH.card} overflow-hidden`}>
-        <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+        <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
           <div className="flex gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-solar-accent/20 text-solar-accent ring-1 ring-solar-accent/30">
               <Package className="h-5 w-5" strokeWidth={2} aria-hidden />
@@ -310,6 +312,7 @@ export default function PackagesSection() {
               <p className="mt-0.5 text-xs text-slate-400">Every 24h after activation or last payout</p>
             </div>
           </div>
+          {/* Referral bonus — commented out
           <div className="flex gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/25">
               <GitBranch className="h-5 w-5" strokeWidth={2} aria-hidden />
@@ -319,6 +322,7 @@ export default function PackagesSection() {
               <p className="mt-0.5 text-xs text-slate-400">Direct commission on each purchase</p>
             </div>
           </div>
+          */}
         </div>
       </section>
 

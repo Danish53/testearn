@@ -18,6 +18,7 @@ import {
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import { ADMIN } from "@/components/admin/admin-ui";
 import { formatCount, formatUsd } from "@/lib/dashboard/format";
+import { MIN_DEPOSIT_USDT } from "@/lib/deposit/constants";
 
 const STATUS_FILTERS = [
   { id: "all", label: "All" },
@@ -154,7 +155,7 @@ function DepositDetail({ deposit, onClose }) {
             </p>
           ) : deposit.status === "below_minimum" ? (
             <p className="rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-              Under $10 minimum — not credited. User must send at least $10 USDT.
+              {`Under $${MIN_DEPOSIT_USDT} minimum — not credited. User must send at least $${MIN_DEPOSIT_USDT} USDT.`}
             </p>
           ) : deposit.status === "pending" ? (
             <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
@@ -255,7 +256,7 @@ export default function AdminDepositsPanel() {
             <p className="text-xs text-slate-600">{formatUsd(summary.pending?.totalUsd)} detected</p>
           </div>
           <div className={`${ADMIN.card} border-red-500/20`}>
-            <p className="text-xs text-slate-500">Below $10 min</p>
+            <p className="text-xs text-slate-500">{`Below $${MIN_DEPOSIT_USDT} min`}</p>
             <p className="mt-1 text-xl font-bold text-red-300">
               {formatCount(summary.below_minimum?.count)}
             </p>

@@ -11,9 +11,10 @@ import {
   NETWORK_IDS,
   networkTabLabel,
 } from "@/lib/wallet/networks";
+import { MIN_WITHDRAW_USDT, WITHDRAW_FEE_USDT } from "@/lib/withdraw/constants";
 
-const FEE = 1;
-const MIN_WITHDRAW = 20;
+const FEE = WITHDRAW_FEE_USDT;
+const MIN_WITHDRAW = MIN_WITHDRAW_USDT;
 
 function statusLabel(status) {
   const map = {
