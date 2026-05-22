@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandMark, { PLATFORM_NAME } from "@/components/BrandMark";
 import { SOLAR_IMAGES } from "@/lib/solarImages";
 
 /**
@@ -58,9 +59,12 @@ export default function AuthShell({
             />
             <div className="relative pl-4 sm:pl-5">
               <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
-                <p className="text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-solar-text-muted sm:text-left">
-                  Earning · Solar
-                </p>
+                <div className="flex items-center justify-center gap-2.5 sm:justify-start">
+                  <BrandMark size="sm" />
+                  <p className="text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-solar-text-muted sm:text-left sm:text-[11px]">
+                    {PLATFORM_NAME}
+                  </p>
+                </div>
                 <span className="shrink-0 rounded-full border border-solar-accent/40 bg-solar-accent/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-solar-accent">
                   {isLogin ? "Login" : "Register"}
                 </span>

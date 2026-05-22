@@ -39,7 +39,7 @@ function ReferralLinkBlock({ title, description, code, variant = "own" }) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Join Earning",
+          title: "Join Solar Earning",
           text: "Register with this referral link:",
           url,
         });

@@ -1,4 +1,5 @@
 import { connectDB } from "@/lib/mongodb";
+import { normalizeEmail } from "@/lib/auth/normalize-email";
 import { verifyOtp } from "@/lib/auth/otp";
 import { signAuthToken } from "@/lib/auth/jwt";
 import { applyVerificationBonuses } from "@/lib/referral/bonuses";
@@ -10,7 +11,7 @@ import User from "@/models/User";
 export async function POST(request) {
   try {
     const body = await request.json();
-    const email = String(body.email || "").trim().toLowerCase();
+    const email = normalizeEmail(body.email);
     const otp = String(body.otp || "").trim();
 
     if (!email || !otp) {

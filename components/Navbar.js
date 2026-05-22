@@ -3,21 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import BrandMark, { PLATFORM_NAME } from "@/components/BrandMark";
 import { logoutUser } from "@/store/slices/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-
-function SunMark({ className = "" }) {
-  return (
-    <span
-      className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-solar-sun-soft ring-1 ring-solar-accent/30 ${className}`}
-      aria-hidden
-    >
-      <svg viewBox="0 0 24 24" className="h-5 w-5 text-solar-sun" fill="currentColor">
-        <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.59-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.59zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.59 1.59a.75.75 0 001.06 1.061l1.59-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.59a.75.75 0 00-1.061 1.06l1.59 1.59z" />
-      </svg>
-    </span>
-  );
-}
 
 export default function Navbar() {
   const router = useRouter();
@@ -50,9 +38,13 @@ export default function Navbar() {
           href="/"
           className="group flex min-w-0 max-w-[65%] items-center gap-2 rounded-md outline-none ring-solar-accent focus-visible:ring-2 sm:max-w-none sm:gap-2.5"
         >
-          <SunMark className="shrink-0 transition-transform duration-300 group-hover:scale-[1.03]" />
+          <BrandMark
+            size="md"
+            className="shrink-0 transition-transform duration-300 group-hover:scale-[1.03]"
+            priority
+          />
           <span className="truncate text-base font-semibold tracking-tight text-solar-text sm:text-lg md:text-xl">
-            Earning
+            {PLATFORM_NAME}
           </span>
         </Link>
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">

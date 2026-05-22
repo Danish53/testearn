@@ -203,7 +203,7 @@ export default function ProfileSection() {
         </form>
       </div>
 
-      <div className={DASH.card}>
+      {/* <div className={DASH.card}>
         <div className="mb-4 flex items-center gap-2">
           <Wallet className="h-5 w-5 text-solar-accent" aria-hidden />
           <h2 className="text-sm font-semibold text-white">Your deposit wallets</h2>
@@ -223,7 +223,7 @@ export default function ProfileSection() {
         <p className="mt-4 text-xs text-slate-500">
           Wallet recovery phrase is held securely by the platform administrator.
         </p>
-      </div>
+      </div> */}
 
       <div className={DASH.card}>
         <div className="mb-4 flex items-center gap-2">

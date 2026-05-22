@@ -284,7 +284,7 @@ export default function SolarLanding({ embedded = false }) {
                   <span className="text-solar-text-muted/90">Rated experience</span>
                 </div>
                 <span className="hidden h-4 w-px bg-solar-border sm:block" aria-hidden />
-                <span className="text-solar-text-muted/90">Solar hub · Earning</span>
+                <span className="text-solar-text-muted/90">Solar hub · Solar Earning</span>
               </div>
             </div>
 
@@ -754,7 +754,7 @@ export default function SolarLanding({ embedded = false }) {
           <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
             <div className="text-center sm:text-left">
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-solar-accent">
-                Earning
+                Solar Earning
               </p>
               <p className="mt-2 text-lg font-semibold tracking-tight text-solar-text sm:text-xl">
                 Solar insights &amp; tools
@@ -783,7 +783,7 @@ export default function SolarLanding({ embedded = false }) {
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-solar-border pt-8 text-center sm:flex-row sm:text-left">
             <p className="text-xs text-solar-text-muted sm:text-sm">
-              © {new Date().getFullYear()} Earning. All rights reserved.
+              © {new Date().getFullYear()} Solar Earning. All rights reserved.
             </p>
             <p className="text-[11px] text-solar-text-muted/80">
               Solar information · Educational use

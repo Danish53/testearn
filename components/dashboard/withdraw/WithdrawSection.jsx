@@ -11,9 +11,11 @@ import {
   NETWORK_IDS,
   networkTabLabel,
 } from "@/lib/wallet/networks";
-import { MIN_WITHDRAW_USDT, WITHDRAW_FEE_USDT } from "@/lib/withdraw/constants";
+import {
+  getWithdrawFeeForNetwork,
+  MIN_WITHDRAW_USDT,
+} from "@/lib/withdraw/constants";
 
-const FEE = WITHDRAW_FEE_USDT;
 const MIN_WITHDRAW = MIN_WITHDRAW_USDT;
 
 function statusLabel(status) {
@@ -41,7 +43,8 @@ export default function WithdrawSection() {
 
   const balance = user?.balance ?? 0;
   const num = parseFloat(amount) || 0;
-  const receive = Math.max(0, Math.round((num - FEE) * 100) / 100);
+  const fee = getWithdrawFeeForNetwork(network);
+  const receive = Math.max(0, Math.round((num - fee) * 100) / 100);
 
   const loadRecent = useCallback(async () => {
     try {
@@ -119,8 +122,8 @@ export default function WithdrawSection() {
         <div className={`${DASH.card} flex gap-3`}>
           <Info className="h-5 w-5 shrink-0 text-slate-500" aria-hidden />
           <p className="text-xs leading-relaxed text-slate-400">
-            Min ${MIN_WITHDRAW} USDT · Fee ${FEE} · Max $5,000/day · Balance is reserved until admin
-            sends USDT to your address and approves the request.
+            Min ${MIN_WITHDRAW} USDT · TRC20 fee $1 · BEP20 no fee · Max $5,000/day · Balance is
+            reserved until admin sends USDT to your address and approves the request.
           </p>
         </div>
       </div>
@@ -193,8 +196,10 @@ export default function WithdrawSection() {
           </div>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm">
             <div className="flex justify-between text-slate-400">
-              <span>Network fee</span>
-              <span className="tabular-nums">${FEE.toFixed(2)}</span>
+              <span>Network fee ({network.toUpperCase()})</span>
+              <span className="tabular-nums">
+                {fee > 0 ? `$${fee.toFixed(2)}` : "No fee"}
+              </span>
             </div>
             <div className="mt-2 flex justify-between font-semibold text-white">
               <span>You receive on-chain</span>

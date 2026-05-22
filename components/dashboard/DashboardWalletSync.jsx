@@ -8,8 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 const SYNC_MS = 60_000;
 
 /**
- * Keeps wallet balance in sync: runs 24h profit accrual + refreshes session user.
- * Deposit scan runs on the Deposit page; profit accrual runs here globally.
+ * Keeps wallet balance in sync: deposit scan, 24h profit accrual, session refresh.
  */
 export default function DashboardWalletSync() {
   const dispatch = useAppDispatch();
@@ -19,10 +18,19 @@ export default function DashboardWalletSync() {
   const syncWallet = useCallback(async () => {
     if (!user?.isVerified) return;
     try {
-      const [accrueRes, meRes] = await Promise.all([
+      const [depositRes, accrueRes, meRes] = await Promise.all([
+        fetch("/api/deposit/check", { method: "POST", credentials: "include" }),
         fetch("/api/investment/accrue", { method: "POST", credentials: "include" }),
         fetch("/api/auth/me", { credentials: "include" }),
       ]);
+
+      if (depositRes.ok) {
+        const depositData = await depositRes.json();
+        if (depositData.user) {
+          dispatch(setUser(depositData.user));
+          return;
+        }
+      }
 
       if (accrueRes.ok) {
         const accrueData = await accrueRes.json();

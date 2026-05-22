@@ -25,7 +25,7 @@ const STEPS = [
   "Open this page and select BEP20 or TRC20",
   "Copy the address or scan the QR code",
   "Send USDT from Trust Wallet, Binance, or any wallet",
-  "We scan the blockchain about every 60s — credited USDT appears in wallet balance",
+  "Balance updates automatically on the dashboard (about every 60s) once your USDT is confirmed",
 ];
 
 const POLL_MS = 60_000;
@@ -80,11 +80,17 @@ export default function DepositSection() {
       setLastScan(new Date());
       if (data.user) dispatch(setUser(data.user));
       const credited = data.creditedCount > 0;
-      setScanMessage(
-        credited
-          ? `${data.message} — wallet balance updated.`
-          : data.message || (data.success ? "Scan complete" : "Scan failed")
-      );
+      const found = (data.incoming ?? 0) > 0;
+      let msg =
+        data.message || (data.success ? "Scan complete" : "Scan failed");
+      if (credited) {
+        msg = `${msg} — wallet balance updated.`;
+      } else if (found && !credited) {
+        msg = `${msg} — see Recent deposits (pending or below minimum).`;
+      } else if (data.success && !found) {
+        msg = `${msg} Check correct network (BEP20/TRC20) and address. If you sent BEP20, wait and scan again.`;
+      }
+      setScanMessage(msg);
       await loadHistory();
     } catch {
       setScanMessage("Could not reach deposit scanner");

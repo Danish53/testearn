@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import StoreProvider from "@/components/providers/StoreProvider";
+import { LOGO_PATH, PLATFORM_NAME, PLATFORM_TAGLINE } from "@/lib/brand";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,9 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Earning — Solar insights & dashboard",
+  title: `${PLATFORM_NAME} — ${PLATFORM_TAGLINE}`,
   description:
-    "Professional solar information and tools. Log in to access your earnings dashboard.",
+    "Professional solar information and tools. Log in to access your Solar Earning dashboard.",
+  icons: {
+    icon: LOGO_PATH,
+    apple: LOGO_PATH,
+  },
 };
 
 export const viewport = {

@@ -40,15 +40,16 @@ export default function RegisterForm() {
     }
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       await dispatch(
         registerUser({
           username: trimmedUsername,
-          email,
+          email: normalizedEmail,
           password,
           referralCode: sponsorCode.trim().toUpperCase(),
         })
       ).unwrap();
-      router.push(`/verify-otp?email=${encodeURIComponent(email.trim().toLowerCase())}`);
+      router.push(`/verify-otp?email=${encodeURIComponent(normalizedEmail)}`);
     } catch {
       /* error in redux */
     }

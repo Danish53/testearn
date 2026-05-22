@@ -3,8 +3,8 @@ import AuthShell from "@/components/auth/AuthShell";
 import LoginForm from "@/components/auth/LoginForm";
 
 export const metadata = {
-  title: "Login — Earning",
-  description: "Sign in to your Earning solar dashboard.",
+  title: "Login — Solar Earning",
+  description: "Sign in to your Solar Earning dashboard.",
 };
 
 export default function LoginPage() {

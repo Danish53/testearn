@@ -19,11 +19,21 @@ export async function POST() {
     await connectDB();
     const updated = await User.findById(user._id);
 
+    let message =
+      result.creditedCount > 0
+        ? `Credited ${result.creditedCount} deposit(s) — $${result.totalCredited.toFixed(2)} USDT`
+        : "Scan complete — no new deposits yet";
+
+    const waiting = (result.deposits || []).filter((d) =>
+      ["pending", "confirmed", "below_minimum"].includes(d.status)
+    );
+    if (result.creditedCount === 0 && waiting.length > 0) {
+      message =
+        "Deposit detected — pending confirmations or below $3 minimum (see Recent deposits)";
+    }
+
     return jsonOk({
-      message:
-        result.creditedCount > 0
-          ? `Credited ${result.creditedCount} deposit(s) — $${result.totalCredited.toFixed(2)} USDT`
-          : "Scan complete — no new deposits yet",
+      message,
       ...result,
       user: updated ? updated.toPublicJSON() : user.toPublicJSON(),
     });

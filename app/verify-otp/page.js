@@ -3,7 +3,7 @@ import AuthShell from "@/components/auth/AuthShell";
 import OtpForm from "@/components/auth/OtpForm";
 
 export const metadata = {
-  title: "Verify email — Earning",
+  title: "Verify email — Solar Earning",
   description: "Enter the verification code sent to your email.",
 };
 

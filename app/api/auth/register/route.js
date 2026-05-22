@@ -1,4 +1,5 @@
 import { connectDB } from "@/lib/mongodb";
+import { normalizeEmail } from "@/lib/auth/normalize-email";
 import { hashPassword } from "@/lib/auth/password";
 import { generateOtpCode, hashOtp, otpExpiryDate } from "@/lib/auth/otp";
 import { isValidUsername, referralCodeFromUsername } from "@/lib/auth/referral";
@@ -12,7 +13,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const username = String(body.username || "").trim().toLowerCase();
-    const email = String(body.email || "").trim().toLowerCase();
+    const email = normalizeEmail(body.email);
     const password = String(body.password || "");
     const sponsorCode = String(body.referralCode || body.sponsorCode || "")
       .trim()
@@ -63,12 +64,14 @@ export async function POST(request) {
     let user = existing;
     if (user) {
       user.username = username;
+      user.email = email;
       user.passwordHash = passwordHash;
       user.referredBy = referredBy;
       user.otpHash = otpHash;
       user.otpExpiresAt = otpExpiryDate();
       user.isVerified = false;
       user.referralCode = ownReferralCode;
+      await user.save();
     } else {
       user = await User.create({
         username,

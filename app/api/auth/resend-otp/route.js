@@ -1,3 +1,4 @@
+import { normalizeEmail } from "@/lib/auth/normalize-email";
 import { connectDB } from "@/lib/mongodb";
 import { generateOtpCode, hashOtp, otpExpiryDate } from "@/lib/auth/otp";
 import { sendOtpEmail } from "@/lib/email/sendOtp";
@@ -7,7 +8,7 @@ import User from "@/models/User";
 export async function POST(request) {
   try {
     const body = await request.json();
-    const email = String(body.email || "").trim().toLowerCase();
+    const email = normalizeEmail(body.email);
 
     if (!email) return jsonError("Email is required");
 

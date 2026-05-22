@@ -11,10 +11,10 @@ const OTP_LENGTH = 6;
 export default function OtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = (searchParams.get("email") || "").trim().toLowerCase();
-
   const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((s) => s.auth);
+  const { loading, error, pendingEmail } = useAppSelector((s) => s.auth);
+  const emailFromUrl = (searchParams.get("email") || "").trim().toLowerCase();
+  const email = (emailFromUrl || pendingEmail || "").trim().toLowerCase();
 
   const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(""));
   const [resent, setResent] = useState(false);

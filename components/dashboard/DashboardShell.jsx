@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,10 +10,7 @@ import DashboardUserFooter from "@/components/dashboard/DashboardUserFooter";
 import DashboardActivePlanBadge from "@/components/dashboard/DashboardActivePlanBadge";
 import DashboardHeaderAvatar from "@/components/dashboard/DashboardHeaderAvatar";
 import DashboardWalletSync from "@/components/dashboard/DashboardWalletSync";
-
-/** Rounded brand mark — white tile + cyan “E” on dark sidebar */
-const BRAND_LOGO =
-  "https://ui-avatars.com/api/?name=E&background=ffffff&color=1facee&size=128&bold=true&format=png";
+import BrandMark, { PLATFORM_NAME } from "@/components/BrandMark";
 
 const SIDEBAR_W = "w-[min(94vw,340px)] lg:w-[300px] xl:w-[320px]";
 const SIDEBAR_PL = "lg:pl-[300px] xl:pl-[320px]";
@@ -66,19 +62,10 @@ export default function DashboardShell({ children }) {
       onClick={closeDrawer}
       className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-solar-accent/50"
     >
-      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/20 sm:h-11 sm:w-11">
-        <Image
-          src={BRAND_LOGO}
-          alt="Earning"
-          fill
-          className="object-cover"
-          sizes="44px"
-          priority
-        />
-      </div>
+      <BrandMark size="lg" priority />
       <div className="min-w-0 text-left leading-tight">
-        <p className="truncate text-sm font-bold uppercase tracking-[0.12em] text-solar-accent sm:text-base">
-          Earning
+        <p className="truncate text-sm font-bold uppercase tracking-[0.1em] text-solar-accent sm:text-base">
+          {PLATFORM_NAME}
         </p>
         <p className="truncate text-[10px] font-medium uppercase tracking-[0.16em] text-white/80 sm:text-[11px]">
           Dashboard

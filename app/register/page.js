@@ -3,8 +3,8 @@ import AuthShell from "@/components/auth/AuthShell";
 import RegisterForm from "@/components/auth/RegisterForm";
 
 export const metadata = {
-  title: "Register — Earning",
-  description: "Create your Earning account. Your username is your referral code.",
+  title: "Register — Solar Earning",
+  description: "Create your Solar Earning account. Your username is your referral code.",
 };
 
 export default function RegisterPage() {

@@ -1,14 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ExternalLink, LogOut, Menu, Shield, X } from "lucide-react";
 import { ADMIN_NAV, isAdminNavActive } from "@/components/admin/admin-nav";
-
-const BRAND_LOGO =
-  "https://ui-avatars.com/api/?name=A&background=1facee&color=ffffff&size=128&bold=true&format=png";
+import BrandMark, { PLATFORM_NAME } from "@/components/BrandMark";
 
 const SIDEBAR_W = "w-[min(92vw,320px)] lg:w-[280px] xl:w-[300px]";
 const SIDEBAR_PL = "lg:pl-[280px] xl:pl-[300px]";
@@ -69,13 +66,16 @@ export default function AdminShell({ children, adminEmail }) {
       onClick={closeDrawer}
       className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-solar-accent/50"
     >
-      <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-solar-accent to-solar-accent-strong shadow-lg shadow-solar-accent/30 ring-1 ring-white/20">
-        <Image src={BRAND_LOGO} alt="" fill className="object-cover opacity-90" sizes="44px" />
-        <Shield className="relative z-[1] h-5 w-5 text-white" aria-hidden />
+      <div className="relative shrink-0">
+        <BrandMark size="lg" />
+        <Shield
+          className="pointer-events-none absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-solar-accent-strong p-0.5 text-white ring-2 ring-[#0a1018]"
+          aria-hidden
+        />
       </div>
       <div className="min-w-0 text-left leading-tight">
-        <p className="truncate text-sm font-bold uppercase tracking-[0.14em] text-solar-accent">
-          Earning
+        <p className="truncate text-sm font-bold uppercase tracking-[0.1em] text-solar-accent">
+          {PLATFORM_NAME}
         </p>
         <p className="truncate text-[10px] font-semibold uppercase tracking-[0.18em] text-white/75">
           Admin panel
