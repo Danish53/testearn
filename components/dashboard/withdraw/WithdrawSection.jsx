@@ -14,6 +14,8 @@ import {
 import {
   getWithdrawFeeForNetwork,
   MIN_WITHDRAW_USDT,
+  WITHDRAW_FEE_BEP20_USDT,
+  WITHDRAW_FEE_TRC20_USDT,
 } from "@/lib/withdraw/constants";
 
 const MIN_WITHDRAW = MIN_WITHDRAW_USDT;
@@ -122,7 +124,8 @@ export default function WithdrawSection() {
         <div className={`${DASH.card} flex gap-3`}>
           <Info className="h-5 w-5 shrink-0 text-slate-500" aria-hidden />
           <p className="text-xs leading-relaxed text-slate-400">
-            Min ${MIN_WITHDRAW} USDT · TRC20 fee $1 · BEP20 no fee · Max $5,000/day · Balance is
+            Min ${MIN_WITHDRAW} USDT · TRC20 fee ${WITHDRAW_FEE_TRC20_USDT} USDT · BEP20 fee $
+            {WITHDRAW_FEE_BEP20_USDT} USDT · Max $5,000/day · Balance is
             reserved until admin sends USDT to your address and approves the request.
           </p>
         </div>

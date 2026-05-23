@@ -22,8 +22,9 @@ export async function POST(request) {
     }
 
     const nextProfit = getNextProfitAt(result.investment);
+    const daily = result.package.dailyProfit;
     return jsonOk({
-      message: `${result.package.name} activated — $${result.package.investment} deducted from wallet. First profit +$${result.package.dailyProfit} USDT in 24h.`,
+      message: `${result.package.name} activated — $${result.package.investment} deducted. +$${daily} USDT daily profit credited now. Next payout in 24h.`,
       nextProfitAt: nextProfit.toISOString(),
       investment: {
         id: result.investment._id.toString(),

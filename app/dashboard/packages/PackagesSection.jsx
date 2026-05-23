@@ -226,8 +226,8 @@ export default function PackagesSection() {
       <div>
         <h1 className={DASH.h1}>VIP Packages</h1>
         <p className={DASH.lead}>
-          Deposit USDT to your wallet, buy a plan (balance deducted), then earn daily profit every
-          24 hours — timer shows time until the next payout.
+          Deposit USDT, buy a plan (balance deducted), and get your first daily profit instantly.
+          After that, earn every 24 hours — the timer shows time until the next payout.
         </p>
       </div>
 
