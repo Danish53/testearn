@@ -15,16 +15,18 @@ export async function POST(request) {
   }
 
   try {
-    const result = await runBlockchainMonitor({ trigger: "cron" });
-    if (result.skipped) {
-      return jsonOk({ message: result.message, skipped: true });
-    }
+    // 🔥 FIRE AND FORGET (NO WAIT = NO 504)
+    runBlockchainMonitor({ trigger: "cron" })
+      .then((result) => {
+        console.log("Blockchain monitor done:", result);
+      })
+      .catch((err) => {
+        console.error("Blockchain monitor error:", err);
+      });
+
     return jsonOk({
-      message: "Blockchain monitor completed",
-      run: result.run,
-      scan: result.scan,
-      refresh: result.refresh,
-      failed: result.failed,
+      message: "Blockchain monitor started",
+      queued: true,
     });
   } catch (err) {
     console.error("cron/blockchain-monitor:", err);
