@@ -5,7 +5,7 @@ import { processUserDeposits } from "@/lib/deposit/process";
 import { userHasWallet } from "@/lib/wallet/provision";
 import User from "@/models/User";
 
-export async function POST() {
+export async function POST(request) {
   try {
     const user = await getSessionUser();
     if (!user) {
@@ -15,7 +15,11 @@ export async function POST() {
       return jsonError("Wallet not found", 404);
     }
 
-    const result = await processUserDeposits(user);
+    const body = await request.json().catch(() => ({}));
+    const txHash = String(body.txHash || "").trim();
+    const network = String(body.network || "bep20").toLowerCase();
+
+    const result = await processUserDeposits(user, { txHash, network });
     await connectDB();
     const updated = await User.findById(user._id);
 
@@ -30,11 +34,22 @@ export async function POST() {
     if (result.creditedCount === 0 && waiting.length > 0) {
       message =
         "Deposit detected — pending confirmations or below $3 minimum (see Recent deposits)";
+    } else if (result.txHint) {
+      message = result.txHint;
+    } else if (
+      result.creditedCount === 0 &&
+      result.incoming === 0 &&
+      result.bep20UsdtOnChain === 0
+    ) {
+      message =
+        "No USDT on your BEP20 address on BSC yet. Send USDT (not BNB coin) on BNB Smart Chain, or paste your transaction hash below.";
     }
 
     return jsonOk({
       message,
       ...result,
+      alerts: result.alerts || [],
+      depositAddress: user.wallet?.bep20Address || "",
       user: updated ? updated.toPublicJSON() : user.toPublicJSON(),
     });
   } catch (err) {

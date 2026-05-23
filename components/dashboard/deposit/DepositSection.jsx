@@ -48,6 +48,8 @@ export default function DepositSection() {
   const [lastScan, setLastScan] = useState(null);
   const [scanMessage, setScanMessage] = useState("");
   const [history, setHistory] = useState([]);
+  const [txHash, setTxHash] = useState("");
+  const [alerts, setAlerts] = useState([]);
 
   const networks = useMemo(
     () => walletNetworksForUser(user?.wallet),
@@ -75,6 +77,11 @@ export default function DepositSection() {
       const res = await fetch("/api/deposit/check", {
         method: "POST",
         credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          txHash: txHash.trim(),
+          network,
+        }),
       });
       const data = await res.json();
       setLastScan(new Date());
@@ -88,20 +95,51 @@ export default function DepositSection() {
       } else if (found && !credited) {
         msg = `${msg} — see Recent deposits (pending or below minimum).`;
       } else if (data.success && !found) {
-        msg = `${msg} Check correct network (BEP20/TRC20) and address. If you sent BEP20, wait and scan again.`;
+        const onChain = data.bep20UsdtOnChain;
+        const addr = data.depositAddress || user?.wallet?.bep20Address;
+        if (onChain === 0 && network === "bep20") {
+          msg = `${msg} On-chain USDT at your BEP20 address is $0 — confirm Trust Wallet sent USDT (not BNB) on BSC to: ${addr ? `${addr.slice(0, 10)}…` : "?"}`;
+        }
       }
       setScanMessage(msg);
+      if (data.alerts) setAlerts(data.alerts);
       await loadHistory();
     } catch {
       setScanMessage("Could not reach deposit scanner");
     } finally {
       setScanning(false);
     }
-  }, [user?.isVerified, dispatch, loadHistory]);
+  }, [user?.isVerified, dispatch, loadHistory, txHash, network]);
+
+  const loadAlerts = useCallback(async () => {
+    try {
+      const res = await fetch("/api/deposit/alerts", { credentials: "include" });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.alerts) setAlerts(data.alerts);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  async function dismissAlerts() {
+    try {
+      await fetch("/api/deposit/alerts", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      await loadAlerts();
+    } catch {
+      /* ignore */
+    }
+  }
 
   useEffect(() => {
     loadHistory();
-  }, [loadHistory]);
+    loadAlerts();
+  }, [loadHistory, loadAlerts]);
 
   useEffect(() => {
     if (!user?.isVerified) return;
@@ -153,6 +191,46 @@ export default function DepositSection() {
         </div>
       </div>
 
+      {/* {alerts.length > 0 ? (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-amber-200">
+              Payment notices{" "}
+              <span className="font-normal text-slate-500">(includes past wrong sends)</span>
+            </p>
+            <button
+              type="button"
+              onClick={() => void dismissAlerts()}
+              className="text-xs font-medium text-slate-400 hover:text-white"
+            >
+              Mark all seen
+            </button>
+          </div>
+          {alerts.map((a) => (
+            <div
+              key={a.id}
+              className={`rounded-xl border px-4 py-3 text-sm ${
+                a.read
+                  ? "border-white/10 bg-white/[0.03] text-slate-400"
+                  : "border-amber-500/35 bg-amber-500/10 text-amber-100/95"
+              }`}
+            >
+              <p className="flex items-start gap-2">
+                <AlertCircle
+                  className={`mt-0.5 h-4 w-4 shrink-0 ${a.read ? "text-slate-500" : "text-amber-400"}`}
+                  aria-hidden
+                />
+                <span>{a.message}</span>
+              </p>
+              <p className="mt-2 font-mono text-[10px] opacity-80">
+                {a.assetSymbol} · {a.network.toUpperCase()} · {a.txHash.slice(0, 14)}…
+                {a.read ? " · seen" : ""}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : null} */}
+
       <div className={DASH.card}>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm font-semibold text-white">Network type</p>
@@ -197,7 +275,7 @@ export default function DepositSection() {
               <p className="flex items-start gap-2">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
                 Send <strong className="font-semibold">USDT only</strong> on {active.label} (
-                {active.chain}). Wrong token or network = permanent loss.
+                {active.chain}) — not BNB coin. Wrong token or network = permanent loss.
               </p>
             </div>
             <p className="text-xs text-slate-500">
@@ -260,6 +338,24 @@ export default function DepositSection() {
             <CheckCircle2 className="h-4 w-4" aria-hidden />
             Monitoring {active.label} — payments detected automatically
           </p>
+        ) : null}
+        {network === "bep20" ? (
+          <div className="mt-4 space-y-2">
+            <label htmlFor="deposit-tx-hash" className={DASH.label}>
+              Transaction hash (if balance not updated)
+            </label>
+            <input
+              id="deposit-tx-hash"
+              type="text"
+              value={txHash}
+              onChange={(e) => setTxHash(e.target.value)}
+              placeholder="0x… from Trust Wallet history"
+              className={`${DASH.input} font-mono text-sm`}
+            />
+            <p className="text-[11px] text-slate-500">
+              Paste BSC tx hash, then tap Scan — we check if it was USDT or BNB.
+            </p>
+          </div>
         ) : null}
         <button
           type="button"
